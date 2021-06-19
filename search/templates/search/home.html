@@ -1,9 +1,150 @@
-{% extends "search/base.html" %}
-{% block content %}
-    {% for post in posts %}
-        <h1>{{post.title}}</h1>
-        <p> By {{post.author}} on {{post.date_posted}}</p>
-        <p>{{post.content}}</p>
-    {% endfor %}
-{% endblock content %}
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.83.1">
+    <title>Dashboard Template · Bootstrap v5.0</title>
 
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/dashboard/">
+
+    
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
+
+    
+    <!-- Custom styles for this template -->
+    <link href="{% static 'search/main.css' %}" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <!--progress bar-->
+    <div class="progress">
+      <div class="progress-bar" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+<!--progress bar-->
+<!-- sidebar -->
+<div class="container-fluid">
+  <div class="row">
+    <nav id="sidebarMenu" class="sidebar">
+      <div class="position-sticky pt-3">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="layers"></span>
+              Object
+            </a>
+          </li>
+        </ul>
+
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+          <span>Metrics</span>
+          <a class="link-secondary" href="#" aria-label="Add a new report">
+            <span data-feather="plus-circle"></span>
+          </a>
+        </h6>
+        <ul class="nav flex-column mb-2">
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              Sensitivity
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              Specificity
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              Precision
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              Accuracy
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              F1 Score
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    
+  </div>
+</div>
+<!-- sidebar -->
+<!--Table-->
+<div class=container>
+  <div class="row">
+  <div class="col">
+    <div class="col-12">
+      <div class="list-group text-center" style="padding-top: 20px" id="list-tab" role="tablist">
+        <li class="list-group-item">Link 1</li>
+        <li class="list-group-item">Link 2</li>
+        <li class="list-group-item">Link 3</li>
+        <li class="list-group-item">Link 4</li>
+        <li class="list-group-item">Link 5</li>
+        <li class="list-group-item">Link 6</li>
+        <li class="list-group-item">Link 7</li>
+        <li class="list-group-item">Link 8</li>
+        <li class="list-group-item">Link 9</li>
+        <li class="list-group-item">Link 10</li>
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <button type="confirm" class="btn btn-primary btn-block">Confirm</button>
+    </div>
+  <div>
+  <!--End of Table-->
+  <!--Object and query form-->
+  <div class="col">
+    <form>
+      <div class="form-group" style="padding-top: 40px">
+        <input type="email" class="form-control text-center sm" id="objectInput" aria-describedby="emailHelp" placeholder="Enter name">
+      </div>
+      <div class="form-group">
+        <textarea class="form-control" rows="5" id="comment" placeholder="Enter queries here"></textarea>
+      </div>
+      <div class=text-center><button type="submit" class="btn btn-primary text-center">Submit</button></div>
+    </form>
+  </div>
+  <div class=text-center style="padding-top: 40px"><button type="confirm" class="btn btn-link">Download Dataset</button></div>
+</div>
+  <!--Object and query form-->
+</div>
+    <script src="../assets/dist/js/bootstrap.bundle.min.js"></script>
+
+      <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js" integrity="sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js" integrity="sha384-zNy6FEbO50N+Cg5wap8IKA4M/ZnLJgzc6w2NqACZaK0u0FXfOWRRJOnQtpZun8ha" crossorigin="anonymous"></script><script src="{% static 'search/main.js' %}"></script>
+  </body>
+</html>
