@@ -1,2 +1,8 @@
 # Search-Engine-Data-Collector
-Summer '21 research project under Forward Data Lab group. Django website that allows easy data collection &amp; annotation from integrated Google Search to find object 'source page' for data extraction. Auto ML model builder &amp; inference with Random Forest.
+
+## Introduction
+This repository contains code that launches a website allowing users to annotate Google Search results to find **source pages**
+A **source page** is defined to be a website that holds specific information about an object. In the case of an iPad, it could be the page that holds the technical specifications. In the case of a politician, it could be their official website. The goal is to find the page that holds information specific to that object to prepare for data extraction.
+
+### About
+The webite uses the Django framework along with Bootstrap for frontend.

@@ -1,3 +1,4 @@
+from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
 from django.http import HttpResponse
 
@@ -19,3 +20,6 @@ def home(request):
     context = {'posts': posts, 'title': 'This is the title'}
     return render(request, 'search/home.html', context)
 # Create your views here.
+def edit(request, annotation):
+    print(annotation)
+    return HttpResponseRedirect('/')
