@@ -11,7 +11,11 @@ document.getElementById('submitAnnotation').addEventListener("click", function()
                 annotation_string = annotation_string.concat('1');
             }
         }
-        document.location.href = document.URL.split('/')[0] + 'edit/' + annotation_string;
+        document.location.href = "http://localhost:8000/" +'edit/' + annotation_string;
+        var splits = document.URL.split('/');
+        for(var i = 0; i < splits.length; i++) {
+            //alert(splits[i]);
+        }
         //document.location.href
 });
 $(function toggleAnnotations(){

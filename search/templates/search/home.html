@@ -54,7 +54,11 @@
           <li class="nav-item">
             <a class="nav-link" href="#">
               <span data-feather="layers"></span>
-              Object
+              {% if object %}
+              Object- {{object}}
+              {% else %}
+              Object:
+              {% endif %}
             </a>
           </li>
         </ul>
@@ -129,14 +133,13 @@
   <!--End of Table-->
   <!--Object and query form-->
   <div class="col">
-    <form>
+    <form action="/your-object/your-queries" method="POST">
+      {% csrf_token %}
       <div class="form-group" style="padding-top: 40px">
-        <input type="email" class="form-control text-center sm" id="objectInput" aria-describedby="emailHelp" placeholder="Enter name">
+        <input id = "your_object" type="text" name="your_object" placeholder="Enter Object Name" class="form-control text-center sm">
+        <textarea class="form-control" rows="5" id="your_queries" name="your_queries" placeholder="Enter queries here"></textarea>
       </div>
-      <div class="form-group">
-        <textarea class="form-control" rows="5" id="comment" placeholder="Enter queries here"></textarea>
-      </div>
-      <div class=text-center><button type="submit" class="btn btn-primary text-center">Submit</button></div>
+      <div class=text-center><input type="submit" class="btn btn-primary text-center"></button></div>
     </form>
   </div>
   <div class=text-center style="padding-top: 40px"><button type="confirm" class="btn btn-link">Download Dataset</button></div>
