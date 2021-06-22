@@ -1,73 +1,153 @@
 {% load static %}
-<!DOCTYPE html>
-<html>
-    <head>
-
-        <!-- Required meta tags -->
+<!doctype html>
+<html lang="en">
+  <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.83.1">
+    <title>Dashboard Template · Bootstrap v5.0</title>
 
-    <!-- Bootstrap CSS -->
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/dashboard/">
+
+    
+
+    <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="{% static 'search/main.css' %}">
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-        
-    {% if title %}
-    <title>Django search - {{title}}</title>
-    {% else %}
-    <title> Django search
-    </title>
-    {% endif %}
-    </head>
-    <body>
 
-        <header class="site-header">
-            <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
-              <div class="container">
-                <a class="navbar-brand mr-4" href="{% url 'search-home' %}">Django Blog</a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarToggle">
-                  <div class="navbar-nav mr-auto">
-                    <a class="nav-item nav-link" href="{% url 'search-home' %}">Home</a>
-                    <a class="nav-item nav-link" href="#">About</a>
-                  </div>
-                  <!-- Navbar Right Side -->
-                  <div class="navbar-nav">
-                    <a class="nav-item nav-link" href="#">Login</a>
-                    <a class="nav-item nav-link" href="#">Register</a>
-                  </div>
-                </div>
-              </div>
-            </nav>
-          </header>
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
 
-        <div class="container">
-            <main role="main" class="container">
-                <div class="row">
-                  <div class="col-md-8">
-                    {% block content %}{% endblock %}
-                  </div>
-                  <div class="col-md-4">
-                    <div class="content-section">
-                      <h3>Our Sidebar</h3>
-                      <p class='text-muted'>You can put any information here you'd like.
-                        <ul class="list-group">
-                          <li class="list-group-item list-group-item-light">Latest Posts</li>
-                          <li class="list-group-item list-group-item-light">Announcements</li>
-                          <li class="list-group-item list-group-item-light">Calendars</li>
-                          <li class="list-group-item list-group-item-light">etc</li>
-                        </ul>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </main>
-        </div>
-        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
+
+    
+    <!-- Custom styles for this template -->
+    <link href="{% static 'search/main.css' %}" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    </body>
+    <!--progress bar-->
+    <div class="progress">
+      <div class="progress-bar" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+<!--progress bar-->
+<!-- sidebar -->
+<div class="container-fluid">
+  <div class="row">
+    <nav id="sidebarMenu" class="sidebar">
+      <div class="position-sticky pt-3">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="layers"></span>
+              {% if object %}
+              Object- {{object}}
+              {% else %}
+              Object:
+              {% endif %}
+            </a>
+          </li>
+        </ul>
+
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+          <span>Metrics</span>
+          <a class="link-secondary" href="#" aria-label="Add a new report">
+            <span data-feather="plus-circle"></span>
+          </a>
+        </h6>
+        <ul class="nav flex-column mb-2">
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              Sensitivity
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              Specificity
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              Precision
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              Accuracy
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              F1 Score
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    
+  </div>
+</div>
+<!-- sidebar -->
+<!--Table-->
+<div class=container>
+  <div class="row">
+  <div class="col">
+    <div class="col-12">
+      <div class="list-group text-center" style="padding-top: 20px" id="list-tab" role="tablist">
+        <li class="list-group-item">Link 1</li>
+        <li class="list-group-item">Link 2</li>
+        <li class="list-group-item">Link 3</li>
+        <li class="list-group-item">Link 4</li>
+        <li class="list-group-item">Link 5</li>
+        <li class="list-group-item">Link 6</li>
+        <li class="list-group-item">Link 7</li>
+        <li class="list-group-item">Link 8</li>
+        <li class="list-group-item">Link 9</li>
+        <li class="list-group-item">Link 10</li>
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <button type="button" id="submitAnnotation" class="btn btn-primary btn-block">Confirm</button>
+    </div>
+  <div>
+  <!--End of Table-->
+  <!--Object and query form-->
+  <div class="col">
+    <form action="/your-object/your-queries" method="POST">
+      {% csrf_token %}
+      <div class="form-group" style="padding-top: 40px">
+        <input id = "your_object" type="text" name="your_object" placeholder="Enter Object Name" class="form-control text-center sm">
+        <textarea class="form-control" rows="5" id="your_queries" name="your_queries" placeholder="Enter queries here"></textarea>
+      </div>
+      <div class=text-center><input type="submit" class="btn btn-primary text-center"></button></div>
+    </form>
+  </div>
+  <div class=text-center style="padding-top: 40px"><button type="confirm" class="btn btn-link">Download Dataset</button></div>
+</div>
+  <!--Object and query form-->
+</div>
+    <script src="../assets/dist/js/bootstrap.bundle.min.js"></script>
+
+      <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js" integrity="sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js" integrity="sha384-zNy6FEbO50N+Cg5wap8IKA4M/ZnLJgzc6w2NqACZaK0u0FXfOWRRJOnQtpZun8ha" crossorigin="anonymous"></script><script src="{% static 'search/main.js' %}"></script>
+  </body>
 </html>

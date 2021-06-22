@@ -4,27 +4,18 @@ from django.http import HttpResponse
 from .forms import QueryForm
 from .source.rf import RFCalculator
 from googlesearch import search
-posts = [{
-    'author': 'CoreyMS',
-    'title': 'Search result 1',
-    'content': 'First search content',
-    'date_posted': 'August 27, 2018'},
-{'author': 'Jane Doe',
-'title': 'Search result 2',
-'content': 'second search content',
-'date_posted': 'August 28, 2018'},
-{'author': 'Aziz S',
-'title': 'Search result 3',
-'content': 'third search content',
-'date_posted': 'August 29, 2018'}]
 rf = RFCalculator()
 current_queries = []
 current_object = ""
+
+def test(request):
+    return render(request, 'search/base.html')
+
+
 def home(request):
-    context = {'posts': posts}
     print(request.method)
     print(request.body)
-    return render(request, 'search/home.html', context)
+    return render(request, 'search/iframe_page.html')
 # Create your views here.
 def edit(request, annotation): #this is submitting annotations
     print(annotation)
@@ -46,6 +37,8 @@ def handle_input(request):
                     print(query)
             current_object = form['your_object']
             if len(current_queries) != 0:
-                return render(request, 'search/home.html', {'links': search(current_queries[0], 10), 'object': current_object})
+                links = search(current_queries[0], 10)
+                print(links)
+                return render(request, 'search/home.html', {'links': links, 'object': current_object})
     
     return render(request, 'search/home.html') #form failed
