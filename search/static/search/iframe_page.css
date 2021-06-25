@@ -95,4 +95,8 @@ body {
     margin-left: 1.25rem;
     text-decoration: none;
   }
+
+  .selected {
+    background: rgb(28, 173, 53)
+  }
   

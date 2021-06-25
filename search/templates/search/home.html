@@ -111,43 +111,25 @@
 <!--Table-->
 <div class=container>
   <div class="row">
-  <div class="col">
-    <div class="col-12">
-      <div class="list-group text-center" style="padding-top: 20px" id="list-tab" role="tablist">
-        <li class="list-group-item">Link 1</li>
-        <li class="list-group-item">Link 2</li>
-        <li class="list-group-item">Link 3</li>
-        <li class="list-group-item">Link 4</li>
-        <li class="list-group-item">Link 5</li>
-        <li class="list-group-item">Link 6</li>
-        <li class="list-group-item">Link 7</li>
-        <li class="list-group-item">Link 8</li>
-        <li class="list-group-item">Link 9</li>
-        <li class="list-group-item">Link 10</li>
-      </div>
-    </div>
-    <div class="row justify-content-center">
-      <button type="button" id="submitAnnotation" class="btn btn-primary btn-block">Confirm</button>
-    </div>
-  <div>
   <!--End of Table-->
   <!--Object and query form-->
   <div class="col">
     <form action="/your-object/your-queries" method="POST">
       {% csrf_token %}
       <div class="form-group" style="padding-top: 40px">
-        <input id = "your_object" type="text" name="your_object" placeholder="Enter Object Name" class="form-control text-center sm">
-        <textarea class="form-control" rows="5" id="your_queries" name="your_queries" placeholder="Enter queries here"></textarea>
+        <input id = "your_object" type="text" name="your_object" placeholder="Enter Object Name" class="form-control text-center sm" required>
+        <textarea class="form-control" rows="5" id="your_queries" name="your_queries" placeholder="Enter queries here" required></textarea>
       </div>
       <div class=text-center><input type="submit" class="btn btn-primary text-center"></button></div>
-    </form>
-  </div>
+        </form>
+      </div>
+      <div class="row">
+        
+      </div>
   <div class=text-center style="padding-top: 40px"><button type="confirm" class="btn btn-link">Download Dataset</button></div>
 </div>
   <!--Object and query form-->
 </div>
-    <script src="../assets/dist/js/bootstrap.bundle.min.js"></script>
-
       <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js" integrity="sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js" integrity="sha384-zNy6FEbO50N+Cg5wap8IKA4M/ZnLJgzc6w2NqACZaK0u0FXfOWRRJOnQtpZun8ha" crossorigin="anonymous"></script><script src="{% static 'search/main.js' %}"></script>
   </body>
 </html>

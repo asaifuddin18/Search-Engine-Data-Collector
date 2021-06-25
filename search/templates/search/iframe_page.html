@@ -119,20 +119,23 @@
       </div>
       <div class="col-10"><!--TM Column-->
         <div class="progress">
-          <div class="progress-bar" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+          <div class="progress-bar" id="progressbar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
-        <iframe src="https://illinois.edu" title="W3Schools Free Online Web Tutorials" style="width:100%" height=950></iframe>
+        <iframe src="{{links.0}}" id="iframe" title="Iframe Viewer" style="width:100%" height=950></iframe>
       </div>
       <div class="col-1"><!--TR Column-->
-        <button type="button" id="notHomepage" class="btn btn-primary">Homepage</button>
+        <button type="button" id="homepage" class="btn btn-primary">Homepage</button>
       </div>
     </div>
   </div>
 </main>
 
 
-    <script src="../assets/dist/js/bootstrap.bundle.min.js"></script>
-
-      <script src="{% static 'search/sidebars.js' %}"></script>
+    <script src="{% static 'search/sidebars.js' %}"></script>
+    {{ links|json_script:"links" }}
+    {% if labels %}
+    {{labels|json_script:"labels"}}
+    {% endif %}
+    <script src="{% static 'search/iframe_page.js' %}"></script>
   </body>
 </html>
