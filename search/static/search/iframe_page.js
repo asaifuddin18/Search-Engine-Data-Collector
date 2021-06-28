@@ -30,7 +30,7 @@ function handleClick() {
         document.location.href = "http://localhost:8000/" +'edit/' + annotation_string;
     } else {
         var iframe = document.getElementById("iframe");
-        iframe.src = links[index];
+        iframe.src = "/url" + index,toString();
         if (labels != null && labels[index] == 0) {
             if (labels[index - 1] != 0) { //labels should be reversed, last homepage was green
                 var not_homepage_button = document.getElementById('notHomepage');
