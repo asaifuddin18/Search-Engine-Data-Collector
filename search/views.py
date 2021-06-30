@@ -7,10 +7,11 @@ from .source.ngram_classification import NgramClassification
 import requests
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup as Soup
-from googlesearch import search
+from .libraries.xgoogle.search import GoogleSearch, SearchError
 rf = NgramClassification()
 current_queries = []
 current_links = []
+current_title_and_desc = []
 current_object = ""
 
 def download_urls(links):
@@ -21,23 +22,23 @@ def download_urls(links):
         head = soup.find('head')
         base = soup.new_tag('base')
         base_url ='http://'+ urlparse(links[i]).netloc
-        print(base_url, "base_url")
         base['href'] = base_url
         head.insert(1, base)
+        contents = '{% verbatim myblock %}' + str(soup) + '{% endverbatim myblock %}'
         with open('./search/templates/search/url' + str(i) + '.html', 'w') as f:
-            f.write(str(soup))
+            f.write(contents)
+        print("Downloaded", links[i])
+
+
 
 def test(request):
     return render(request, 'search/base.html')
 
 
 def home(request):
-    print(request.method)
-    print(request.body)
     return render(request, 'search/home.html')
 # Create your views here.
 def edit(request, annotation): #this is submitting annotations
-    print(annotation)
     truths = []
     for c in annotation:
         if c == '0':
@@ -53,19 +54,35 @@ def edit(request, annotation): #this is submitting annotations
     if len(current_queries) != 0: #trying to annotate without any input check
         del current_queries[0]
         if len(current_queries) != 0:#ran out of queries
-            current_links = search(current_queries[0], 10)
+            try:
+                gs = GoogleSearch(current_queries[0])
+                gs.results_per_page = 15
+                results = gs.get_results()
+                current_links.clear()
+                current_title_and_desc.clear()
+                for result in results:
+                    if (result.url[0] == '/'):
+                        continue
+                    current_links.append(result.url)
+                    current_title_and_desc.append((result.title, result.desc))
+                    if len(current_links) >=10:
+                        break
+                    
+                print("num results:", len(current_links))
+                download_urls(current_links)
+            except SearchError:
+                return render(request, 'search/home.html') #probably change this to call edit() again
+            
             predictions = rf.predict(current_links, [], current_object)
-            print(predictions)
             labels = []
             for current in predictions:
                 if current == "not_homepage":
                     labels.append(0)
                 else:
                     labels.append(1)
-            print(labels)
+            print("Predictions:", labels)
             data = rf.generate_random_forest()
             data.insert(0, current_object)
-            download_urls(current_links)
             return render(request, 'search/iframe_page.html', {'links': current_links, 'labels': labels, 'stats_local': data})
     return render(request, 'search/home.html')
 
@@ -73,28 +90,35 @@ def handle_input(request):
     if request.method == 'POST':
         form = QueryForm(request.POST)
         if form.is_valid():
-            print("handled input")
+            
             queries = form['your_queries'].value().split('\n')
             for query in queries:
                 if query != "":
                     current_queries.append(query)
-                    print(query)
+                    print("Query:", query)
             global current_object
             print(form['your_object'])
             current_object = "" + str(form['your_object'].value())
             if len(current_queries) != 0:
                 global current_links
-                current_links = search(current_queries[0], 11)
-                current_links = list(set(list(current_links)))
-                print(len(current_links))
-                if current_links[0][:7] == '/search':
-                    del current_links[0]
-                else:
-                    del current_links[10]
-                
-                print(current_links)
-                print(len(current_links))
-                download_urls(current_links)
+                try:
+                    gs = GoogleSearch(current_queries[0])
+                    gs.results_per_page = 15
+                    results = gs.get_results()
+                    current_links.clear()
+                    current_title_and_desc.clear()
+                    for result in results:
+                        if (result.url[0] == '/'):
+                            continue
+                        current_links.append(result.url)
+                        current_title_and_desc.append((result.title, result.desc))
+                        if len(current_links) >=10:
+                            break
+                    
+                    print("num results:", len(current_links))
+                    download_urls(current_links)
+                except SearchError:
+                    return render(request, 'search/home.html')
                     
 
                 return render(request, 'search/iframe_page.html', {'links': current_links, 'stats_local': [current_object, 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']})

@@ -26,7 +26,7 @@ function handleClick() {
     var percent = (index/links.length)*100;
     progressbar.style = "width: " + percent.toString() + "%";
     progressbar.width = percent;
-    if (index >= links.length) {
+    if (index >= links.length || index >=10) {
         document.location.href = "http://localhost:8000/" +'edit/' + annotation_string;
     } else {
         var iframe = document.getElementById("iframe");

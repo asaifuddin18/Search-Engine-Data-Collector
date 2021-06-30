@@ -10,6 +10,4 @@ The webite uses the Django framework along with Bootstrap for frontend.
 
 
 ## TODO
-iframe alternative (php script may not work)
-but for now, use iframe
-check if website can be loaded using iframe via php script
+BUG: Some iFrames cause the entire page to redirect (e.g. stackoverflow)
