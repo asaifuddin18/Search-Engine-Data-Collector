@@ -77,3 +77,7 @@ window.onload = function() {
     var object_ele = document.getElementById("object");
     object_ele.textContent("Object: " + stats_local[0]);
 };
+
+window.onbeforeunload = function(){
+    return 'Are you sure you want to leave?';
+};

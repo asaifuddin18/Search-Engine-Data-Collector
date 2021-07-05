@@ -8,11 +8,24 @@ import requests
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup as Soup
 from .libraries.xgoogle.search import GoogleSearch, SearchError
+import re
 rf = NgramClassification()
 current_queries = []
 current_links = []
 current_title_and_desc = []
 current_object = ""
+
+#def fetch_latest_query():
+
+
+
+def clean_title_and_desc(title, desc):
+    title_ = title.lower().strip()
+    desc_ = desc.lower().strip()
+    title_ = re.sub(r'[^a-zA-Z0-9]', '', title_) #this removes spaces, may need to be changed in the future if using a different feature method
+    desc_ = re.sub(r'[^a-zA-Z0-9]', '', desc_)
+    return title_, desc_
+
 
 def download_urls(links):
     for i in range(len(links)):
@@ -36,7 +49,8 @@ def test(request):
 
 
 def home(request):
-    return render(request, 'search/home.html')
+    context = {'stats_local': ['Total Stats', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']}
+    return render(request, 'search/home.html', context=context)
 # Create your views here.
 def edit(request, annotation): #this is submitting annotations
     truths = []
@@ -48,8 +62,9 @@ def edit(request, annotation): #this is submitting annotations
     
     #do rf stuff here
     global current_links
+    global current_title_and_desc
     for i in range(len(current_links)):
-        rf.add_datapoint(current_links[i], "", truths[i], current_object)
+        rf.add_datapoint(current_links[i], current_title_and_desc[i][1], truths[i], current_object, current_title_and_desc[i][0])
     
     if len(current_queries) != 0: #trying to annotate without any input check
         del current_queries[0]
@@ -64,7 +79,9 @@ def edit(request, annotation): #this is submitting annotations
                     if (result.url[0] == '/'):
                         continue
                     current_links.append(result.url)
-                    current_title_and_desc.append((result.title, result.desc))
+                    current_title_and_desc.append(clean_title_and_desc(result.title, result.desc))
+                    print("Title:", current_title_and_desc[-1][0])
+                    print("Desc:", current_title_and_desc[-1][1])
                     if len(current_links) >=10:
                         break
                     
@@ -73,7 +90,7 @@ def edit(request, annotation): #this is submitting annotations
             except SearchError:
                 return render(request, 'search/home.html') #probably change this to call edit() again
             
-            predictions = rf.predict(current_links, [], current_object)
+            predictions = rf.predict(current_links, [x[1] for x in current_title_and_desc], current_object, [x[0] for x in current_title_and_desc])
             labels = []
             for current in predictions:
                 if current == "not_homepage":
@@ -84,7 +101,9 @@ def edit(request, annotation): #this is submitting annotations
             data = rf.generate_random_forest()
             data.insert(0, current_object)
             return render(request, 'search/iframe_page.html', {'links': current_links, 'labels': labels, 'stats_local': data})
-    return render(request, 'search/home.html')
+    data = rf.generate_random_forest()
+    data.insert(0, 'Total Stats')
+    return render(request, 'search/home.html', {'stats_local': data})
 
 def handle_input(request):
     if request.method == 'POST':
@@ -94,11 +113,11 @@ def handle_input(request):
             queries = form['your_queries'].value().split('\n')
             for query in queries:
                 if query != "":
-                    current_queries.append(query)
+                    current_queries.append(query.lower())
                     print("Query:", query)
             global current_object
             print(form['your_object'])
-            current_object = "" + str(form['your_object'].value())
+            current_object = "" + str(form['your_object'].value()).lower()
             if len(current_queries) != 0:
                 global current_links
                 try:
@@ -111,7 +130,9 @@ def handle_input(request):
                         if (result.url[0] == '/'):
                             continue
                         current_links.append(result.url)
-                        current_title_and_desc.append((result.title, result.desc))
+                        current_title_and_desc.append(clean_title_and_desc(result.title, result.desc))
+                        print("Title:", current_title_and_desc[-1][0])
+                        print("Desc:", current_title_and_desc[-1][1])
                         if len(current_links) >=10:
                             break
                     

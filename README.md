@@ -10,4 +10,5 @@ The webite uses the Django framework along with Bootstrap for frontend.
 
 
 ## TODO
-BUG: Some iFrames cause the entire page to redirect (e.g. stackoverflow)
+Replace iFrame with raw HTML
+Fix xgoogle so it properly gets the description

@@ -40,12 +40,14 @@ class NgramClassification:
         for c1 in ascii_lowercase:
             for c2 in ascii_lowercase:
                 for c3 in ascii_lowercase:
-                    self.features.append(c1+c2+c3)
+                    self.features.append(c1+c2+c3+'_u')
+                    self.features.append(c1+c2+c3+'_d')
+                    self.features.append(c1+c2+c3+'_t')
 
         self.df = pd.DataFrame(columns=self.features)
         pass
 
-    def __generate_trigrams(self, formatted_url) -> list():
+    def __generate_trigrams(self, formatted_url, description, title) -> list():
         """
         Helper function that constructs the tri-grams required for feature generation
 
@@ -53,6 +55,10 @@ class NgramClassification:
         ----------
         formatted_url: str
             The new string of the url, lowercase and containing only letters
+        description: str
+            The text snippet that google provides under the URL in a google search
+        title: str
+            The text that appears hyperlinked
 
         Returns
         list
@@ -60,11 +66,15 @@ class NgramClassification:
         """
         tri_grams = []
         for i in range(2, len(formatted_url)):
-            tri_grams.append(formatted_url[i-2] + formatted_url[i-1] + formatted_url[i])
+            tri_grams.append(formatted_url[i-2] + formatted_url[i-1] + formatted_url[i] + '_u')
+        for i in range(2, len(description)):
+            tri_grams.append(description[i-2] + description[i-1] + description[i] + '_d')
+        for i in range(2, len(title)):
+            tri_grams.append(title[i-2] + title[i-1] + title[i] + '_t')
         
         return tri_grams
     
-    def __construct_features(self, url, snippet, object) -> list():
+    def __construct_features(self, url, description, object, title) -> list():
         """
         Helper function that constructs the features required for the Random Forest
 
@@ -72,26 +82,37 @@ class NgramClassification:
         ----------
         url: str
             The URL of the datapoint
-        snippet: str
+        description: str
             The text snippet that google provides under the URL in a google search
+        title: str
+            The text that appears hyperlinked
 
         Returns
         -------
         list
             A list of features generated from the URL and the snippet
         """
-        features = np.zeros((17576,))
+        features = np.zeros((17576*3,))
         formatted_url = "" + url
         formatted_url = re.sub(r'[^a-zA-Z]', '', formatted_url)
         formatted_url = formatted_url.lower()
-        tri_grams = self.__generate_trigrams(formatted_url)
+
+        formatted_title = "" + title
+        formatted_title = re.sub(r'[^a-zA-Z]', '', formatted_title)
+        formatted_title = formatted_title.lower()
+
+        formatted_desc = "" + description
+        formatted_desc = re.sub(r'[^a-zA-Z]', '', formatted_desc)
+        formatted_desc = formatted_desc.lower()
+
+        tri_grams = self.__generate_trigrams(formatted_url, formatted_desc, formatted_title)
         for tri_gram in tri_grams:
             features[self.features.index(tri_gram)] += 1
 
 
         return features
 
-    def add_datapoint(self, url, snippet, label, object) -> None:
+    def add_datapoint(self, url, description, label, object, title) -> None:
         """
         Parameters
         ----------
@@ -105,7 +126,7 @@ class NgramClassification:
             The name of the object
         """
         
-        self.df.loc[len(self.df.index)] = self.__construct_features(url, snippet, object)
+        self.df.loc[len(self.df.index)] = self.__construct_features(url, description, object, title)
         if label not in self.sd:
             self.sd[label] = self.idx
             self.idx += 1
@@ -180,7 +201,7 @@ class NgramClassification:
         return [accuracy, recall, specificity, precision, f1]
 
 
-    def predict(self, urls, snippets, object) -> list():
+    def predict(self, urls, snippets, object, titles) -> list():
         """
         Creates predictions based on input URLs
 
@@ -189,7 +210,9 @@ class NgramClassification:
         urls: list
             A list of URLs to cast predictions on
         snippets: list
-            A list of strings that re the snippets google returns alongside URLs on search queries
+            A list of strings that are the descriptions google returns alongside URLs on search queries
+        titles: list
+            A list of titles that are hyperlinked to the URL returned upon search queries
 
         Returns
         -------
@@ -204,7 +227,7 @@ class NgramClassification:
         #data_test = np.array((len(urls), len(self.features)))
         data_test = []
         for i in range(len(urls)):
-            data_test.append(self.__construct_features(urls[i], "", object))
+            data_test.append(self.__construct_features(urls[i], snippets[i], object, titles[i]))
         data_test = np.array(data_test)
         data_train = np.asarray(self.df)
         rf = RandomForestClassifier()
