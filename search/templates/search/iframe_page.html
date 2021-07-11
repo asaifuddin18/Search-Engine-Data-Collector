@@ -39,6 +39,7 @@
     <link href="{% static 'search/iframe_page.html' %}" rel="stylesheet">
   </head>
   <body>
+    <style>.ezO2md{border:thin solid #dadce0;padding:12px 16px 12px 16px;margin-bottom:10px;font-family:Roboto,Helvetica,Arial,sans-serif}.lIMUZd{font-family:Roboto,Helvetica,Arial,sans-serif}.h05j6b{padding-bottom:12px}.BhZo9{border-collapse:collapse;border-spacing:0;width:100%}.T7QDIc{margin-top:12px}.szkQOb{display:block;float:right;padding-left:16px}.zBgUmc{clear:both}.M1Tmcc{padding-top:12px}.fYyStc{word-break:break-word}.ynsChf{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.Fj3V3b{color:#1967D2;font-size:14px;line-height:20px}.FrIlee{color:#202124;font-size:13px;line-height:20px}.F9iS2e{color:#70757a;font-size:13px;line-height:20px}.WMQ2Le{color:#70757a;font-size:12px;line-height:16px}.x3G5ab{color:#202124;font-size:18px;line-height:24px}.fuLhoc{color:#1967D2;font-size:18px;line-height:24px}.epoveb{font-size:32px;line-height:40px;font-weight:400;color:#202124}.dXDvrc{color:#0d652d;font-size:14px;line-height:20px;word-wrap:break-word}.dloBPe{font-weight:bold}.YVIcad{color:#70757a}.JkVVdd{color:#ea4335}.oXZRFd{color:#ea4335}.MQHtg{color:#fbbc04}.pyMRrb{color:#1e8e3e}.EtTZid{color:#1e8e3e}.M3vVJe{color:#1967D2}.qXLe6d{display:block}.NHQNef{font-style:italic}.Cb8Z7c{white-space:pre}a.ZWRArf{text-decoration:none}a .CVA68e:hover{text-decoration:underline}.BhZo9 td{padding-top:0;padding-bottom:0;padding-right:8px}.BhZo9 .inq5Bd{padding-right:0}.iegPM{vertical-align:top}.nuiMpb{text-align:left}.GuUxQ{text-align:center}.mfvA7{text-align:right}.hcz0vb{float:left;margin-right:8px}.KQfzZe{height:4px}.YgS6de{width:100%}.OWPbab{border-spacing:0;width:100%}.f3hb4{vertical-align:top;width:100%}.c4ImMc{padding-bottom:8px}.TYvcTb{margin:0}.RFi43d{padding-top:12px}.H5U6Eb{width:100%;padding-top:12px}.UoE3xe{display:inline-block;padding:2px;padding-bottom:4px}.IGO2bd{vertical-align:bottom}.cnjbFd{display:block;padding-top:12px}.SAvc1d{border-spacing:0;width:100%;table-layout:auto;padding:4px 0 4px 0}.Z4Pjr{text-align:right}</style>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
@@ -121,16 +122,18 @@
   <div class="container">
     <div class="row">
       <div class="col-1"><!--TL Column-->
-        <button type="button" id="notHomepage" class="btn btn-primary">Not Homepage</button>
+        
       </div>
       <div class="col-10"><!--TM Column-->
         <div class="progress">
           <div class="progress-bar" id="progressbar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
-        <iframe src="{% url 'url0' %}" sandbox="allow-popups-to-escape-sandbox allow-modals allow-forms allow-popups allow-pointer-lock allow-same-origin allow-scripts" id="iframe" title="Iframe Viewer" style="width:100%" height=950></iframe>
+        {% for d in divs %}
+        {{d|safe}}
+        {% endfor %}
       </div>
       <div class="col-1"><!--TR Column-->
-        <button type="button" id="homepage" class="btn btn-primary">Homepage</button>
+        <button type="button" id="submit_annotation" class="btn btn-primary">Submit</button>
       </div>
     </div>
   </div>

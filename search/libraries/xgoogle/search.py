@@ -149,8 +149,9 @@ class GoogleSearch(object):
             return []
         MAX_VALUE = 1000000
         page = self._get_results_page()
+        
         #search_info = self._extract_info(page)
-        results = self._extract_results(page)
+        results, divs = self._extract_results(page)
         
         search_info = {'from': self.results_per_page*self._page,
                        'to': self.results_per_page*self._page + len(results),
@@ -171,7 +172,7 @@ class GoogleSearch(object):
             self.eor = True
         self._page += 1
         self._last_from = search_info['from']
-        return results
+        return results, divs
 
     def _maybe_raise(self, cls, *arg):
         if self.debug:
@@ -236,7 +237,7 @@ class GoogleSearch(object):
             eres = self._extract_result(result)
             if eres:
                 ret_res.append(eres)
-        return ret_res
+        return ret_res, results
 
     def _extract_result(self, result):
         title, url = self._extract_title_url(result)
@@ -272,29 +273,6 @@ class GoogleSearch(object):
                 results += current.string
         
         return results
-        if not desc_div:
-            self._maybe_raise(ParseError, "Description tag in Google search result was not found", result)
-            return None
-
-        desc_strs = []
-        def looper(tag):
-            if not tag: return
-            for t in tag:
-                try:
-                    if t.name == 'br': break
-                except AttributeError:
-                    pass
-
-                try:
-                    desc_strs.append(t.string)
-                except AttributeError:
-                    desc_strs.append(t)
-
-        looper(desc_div)
-        looper(desc_div.find('wbr')) # BeautifulSoup does not self-close <wbr>
-
-        desc = ''.join(s for s in desc_strs if s)
-        return self._html_unescape(desc)
 
     def _html_unescape(self, str):
         def entity_replacer(m):

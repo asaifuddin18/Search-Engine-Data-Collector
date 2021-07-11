@@ -7,6 +7,7 @@ from .source.ngram_classification import NgramClassification
 import requests
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup as Soup
+import bs4
 from .libraries.xgoogle.search import GoogleSearch, SearchError
 import re
 rf = NgramClassification()
@@ -72,7 +73,13 @@ def edit(request, annotation): #this is submitting annotations
             try:
                 gs = GoogleSearch(current_queries[0])
                 gs.results_per_page = 15
-                results = gs.get_results()
+                results, divs = gs.get_results()
+                for i in range(len(divs)):
+                    for descendant in divs[i].descendants:
+                        if descendant != "" and descendant != " " and not isinstance(descendant, bs4.element.NavigableString) and descendant.has_attr('href'):
+                            descendant['href'] = '#'
+                    
+                str_divs = [str(x) for x in divs]
                 current_links.clear()
                 current_title_and_desc.clear()
                 for result in results:
@@ -86,7 +93,7 @@ def edit(request, annotation): #this is submitting annotations
                         break
                     
                 print("num results:", len(current_links))
-                download_urls(current_links)
+                #download_urls(current_links)
             except SearchError:
                 return render(request, 'search/home.html') #probably change this to call edit() again
             
@@ -100,7 +107,7 @@ def edit(request, annotation): #this is submitting annotations
             print("Predictions:", labels)
             data = rf.generate_random_forest()
             data.insert(0, current_object)
-            return render(request, 'search/iframe_page.html', {'links': current_links, 'labels': labels, 'stats_local': data})
+            return render(request, 'search/iframe_page.html', {'links': current_links, 'labels': labels, 'stats_local': data, 'divs': str_divs})
     data = rf.generate_random_forest()
     data.insert(0, 'Total Stats')
     return render(request, 'search/home.html', {'stats_local': data})
@@ -122,8 +129,18 @@ def handle_input(request):
                 global current_links
                 try:
                     gs = GoogleSearch(current_queries[0])
-                    gs.results_per_page = 15
-                    results = gs.get_results()
+                    gs.results_per_page = 10
+                    results, divs = gs.get_results()
+                    for i in range(len(divs)):
+                        if divs[i].find('div', class_='H5U6Eb'): #images
+                            del divs[i]
+                            i -= 1
+                            continue
+                        for descendant in divs[i].descendants:
+                            if descendant != "" and descendant != " " and not isinstance(descendant, bs4.element.NavigableString) and descendant.has_attr('href'):
+                                descendant['href'] = '#'
+                    
+                    str_divs = [str(x) for x in divs]
                     current_links.clear()
                     current_title_and_desc.clear()
                     for result in results:
@@ -137,12 +154,12 @@ def handle_input(request):
                             break
                     
                     print("num results:", len(current_links))
-                    download_urls(current_links)
+                    #download_urls(current_links)
                 except SearchError:
                     return render(request, 'search/home.html')
                     
 
-                return render(request, 'search/iframe_page.html', {'links': current_links, 'stats_local': [current_object, 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']})
+                return render(request, 'search/iframe_page.html', {'links': current_links, 'stats_local': [current_object, 'N/A', 'N/A', 'N/A', 'N/A', 'N/A'], 'divs': str_divs})
     return render(request, 'search/home.html') #form failed
 
 def url0(request):

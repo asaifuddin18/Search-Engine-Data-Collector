@@ -14,7 +14,7 @@ body {
     height: -webkit-fill-available;
     max-height: 100vh;
     overflow-x: auto;
-    overflow-y: hidden;
+    overflow-y: auto;
   }
   
   .b-example-divider {
@@ -98,5 +98,16 @@ body {
 
   .selected {
     background: rgb(28, 173, 53)
+  }
+
+  .col-10 {
+    overflow: auto;
+  }
+
+  .ezO2md{
+    border:thin solid #dadce0;
+    padding:12px 16px 12px 16px;
+    margin-bottom:10px;
+    font-family:Roboto,Helvetica,Arial,sans-serif;
   }
   
