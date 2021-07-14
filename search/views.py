@@ -146,12 +146,13 @@ def handle_input(request):
                     current_links.clear()
                     current_title_and_desc.clear()
                     for result in results:
+                        print(result.url)
                         if (result.url[0] == '/'):
                             continue
                         current_links.append(result.url)
                         current_title_and_desc.append(clean_title_and_desc(result.title, result.desc))
-                        print("Title:", current_title_and_desc[-1][0])
-                        print("Desc:", current_title_and_desc[-1][1])
+                        #print("Title:", current_title_and_desc[-1][0])
+                        #print("Desc:", current_title_and_desc[-1][1])
                         if len(current_links) >=10:
                             break
                     

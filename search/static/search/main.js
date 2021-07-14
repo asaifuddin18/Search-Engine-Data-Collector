@@ -1,46 +1,15 @@
-/* globals Chart:false, feather:false */
-document.getElementById('submitAnnotation').addEventListener("click", function() {
-    var annotation_string = "";
-        var temp = document.getElementById("list-tab");
-        var list = temp.getElementsByTagName("li");
-        for(var i = 0; i < 10; i++) {
-            //alert(list[i].getAttribute("class").toString() == "list-group-item");
-            if (list[i].getAttribute("class").toString() == "list-group-item") {
-                annotation_string = annotation_string.concat('0');
-            } else {
-                annotation_string = annotation_string.concat('1');
-            }
-        }
-        document.location.href = "http://localhost:8000/" +'edit/' + annotation_string;
-        var splits = document.URL.split('/');
-        for(var i = 0; i < splits.length; i++) {
-            //alert(splits[i]);
-        }
-        //document.location.href
-});
-$(function toggleAnnotations(){
-  $('.list-group li').click(function(e) {
-      e.preventDefault()
-      $that = $(this);
-      if ($that.hasClass('selected')) {
-      $that.removeClass('selected');
-      } else {
-      $that.addClass('selected');
-      }
-    
-  });
-})
+var dict = {
+    "Professor": "FirstName LastName Institution\ne.g. Jian Peng UIUC",
+    "Movie": "Name Year\ne.g. Avatar 2009",
+    "Electronic": "Model Year/Model\ne.g. iPhone 12"
+};
 
-    function sendAnnotations(){
-        alert('button clicked');
-        var annotation_string = "";
-        var list = document.getElementById("list-tab");
-        for(i = 0; i < 10; i++) {
-            if (list[i].hasClass('selected')) {
-                annotation_string.append('1');
-            } else {
-                annotation_string.append('0');
-            }
-        }
-        document.location.href = document.URL + annotation_string;
-  }
+window.onload = function() {
+    for (var key in dict) {
+        document.getElementById(key).addEventListener("click", function(event) {
+            var queryBox = document.getElementById("your_queries");
+            queryBox.placeholder = "Enter queries following the template: " + dict[event.target.id];
+            document.getElementById("dropdownMenuButton").textContent = event.target.id;
+        })
+    }
+}

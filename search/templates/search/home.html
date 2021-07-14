@@ -35,7 +35,6 @@
     
     <!-- Custom styles for this template -->
     <link href="{% static 'search/main.css' %}" rel="stylesheet" type="text/css">
-    <link href="{% static 'search/iframe_page.css' %}" rel="stylesheet">
   </head>
   <body>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
@@ -44,7 +43,6 @@
 <!-- sidebar -->
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
   <symbol id="illini" viewBox="0 0 75 75">
-    <title>Bootstrap</title>
     <path d="M42.12,18.05h9.03V3.01H3.01v15.04h9.03c1.66,0,3.01,1.35,3.01,3.01v36.1c0,1.66-1.35,3.01-3.01,3.01H3.01
     v15.04h48.14V60.17h-9.03c-1.66,0-3.01-1.35-3.01-3.01v-36.1C39.11,19.4,40.46,18.05,42.12,18.05z"></path>
   </symbol>
@@ -70,7 +68,7 @@
 <main>
   <h1 class="visually-hidden">Sidebars examples</h1>
 
-  <div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark" style="width: 280px;">
+  <div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark">
     <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
       <svg class="bi me-2" width="40" height="32"><use xlink:href="#illini"/></svg>
       <span class="fs-4">Annotation Tool</span>
@@ -124,24 +122,37 @@
   <div class="row">
   <!--End of Table-->
   <!--Object and query form-->
-  <div class="col">
-    <form action="/your-object/your-queries" method="POST">
-      {% csrf_token %}
-      <div class="form-group" style="padding-top: 40px">
-        <input id = "your_object" type="text" name="your_object" placeholder="Enter Object Name" class="form-control text-center sm" required>
-        <textarea class="form-control" rows="5" id="your_queries" name="your_queries" placeholder="Enter queries here" required></textarea>
-      </div>
-      <div class=text-center><input type="submit" class="btn btn-primary text-center"></button></div>
+    <div class="col-11">
+      <div class="row">
+        <form action="/your-object/your-queries" method="POST">
+          {% csrf_token %}
+          <div class="form-group" style="padding-top: 40px">
+            <input id = "your_object" type="text" name="your_object" placeholder="Enter Object Name" class="form-control text-center sm" required>
+            <textarea class="form-control" rows="5" id="your_queries" name="your_queries" placeholder="Select a query template to get started" required></textarea>
+          </div>
+          <div class=text-center><input type="submit" class="btn btn-primary text-center"></button></div>
         </form>
       </div>
       <div class="row">
-        
+        <div class=text-center style="padding-top: 40px"><button type="confirm" class="btn btn-link">Download Dataset</button></div>
       </div>
-  <div class=text-center style="padding-top: 40px"><button type="confirm" class="btn btn-link">Download Dataset</button></div>
-</div>
+    </div>
+    <div class="col-1">
+      <div class="dropdown" style="padding-top: 40px">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Query Templates
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <a class="dropdown-item" id="Professor" href="#">Professor</a>
+          <a class="dropdown-item" id="Movie" href="#">Movie</a>
+          <a class="dropdown-item" id="Electronic" href="#">Electronic</a>
+        </div>
+      </div>
+    </div>
+  </div>
   <!--Object and query form-->
 </div>
-      <script src="{% static 'search/sidebars.js' %}"></script>
-      <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js" integrity="sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js" integrity="sha384-zNy6FEbO50N+Cg5wap8IKA4M/ZnLJgzc6w2NqACZaK0u0FXfOWRRJOnQtpZun8ha" crossorigin="anonymous"></script><script src="{% static 'search/main.js' %}"></script>
-  </body>
+<script src="{% static 'search/sidebars.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js" integrity="sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js" integrity="sha384-zNy6FEbO50N+Cg5wap8IKA4M/ZnLJgzc6w2NqACZaK0u0FXfOWRRJOnQtpZun8ha" crossorigin="anonymous"></script><script src="{% static 'search/main.js' %}"></script>
+</body>
 </html>

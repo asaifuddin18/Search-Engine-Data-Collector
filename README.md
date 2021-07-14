@@ -12,7 +12,7 @@ The webite uses the Django framework along with Bootstrap for frontend.
 ## TODO
 Add links back into Google search result Divs
 
-Add search query templates
+~~Add search query templates~~
 
 Remove "Images" and "Related Searches"
 
