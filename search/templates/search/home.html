@@ -127,7 +127,7 @@
         <form action="/your-object/your-queries" method="POST">
           {% csrf_token %}
           <div class="form-group" style="padding-top: 40px">
-            <input id = "your_object" type="text" name="your_object" placeholder="Enter Object Name" class="form-control text-center sm" required>
+            <input id = "your_object" type="text" name="your_object" placeholder="Select Query Template" class="form-control text-center sm" readonly required>
             <textarea class="form-control" rows="5" id="your_queries" name="your_queries" placeholder="Select a query template to get started" required></textarea>
           </div>
           <div class=text-center><input type="submit" class="btn btn-primary text-center"></button></div>

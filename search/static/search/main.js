@@ -10,6 +10,8 @@ window.onload = function() {
             var queryBox = document.getElementById("your_queries");
             queryBox.placeholder = "Enter queries following the template: " + dict[event.target.id];
             document.getElementById("dropdownMenuButton").textContent = event.target.id;
+            var your_object = document.getElementById("your_object");
+            your_object.value = event.target.id;
         })
     }
 }

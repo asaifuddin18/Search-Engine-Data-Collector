@@ -152,7 +152,6 @@ class GoogleSearch(object):
         
         #search_info = self._extract_info(page)
         results, divs = self._extract_results(page)
-        
         search_info = {'from': self.results_per_page*self._page,
                        'to': self.results_per_page*self._page + len(results),
                        'total': MAX_VALUE}
@@ -232,12 +231,14 @@ class GoogleSearch(object):
         #results = soup.find_all('li', {'class': 'g'})
         results = soup.find_all("div", class_="ezO2md")
         ret_res = []
+        ret_divs = []
         
-        for result in results:
-            eres = self._extract_result(result)
+        for i in range(len(results)):
+            eres = self._extract_result(results[i])
             if eres:
                 ret_res.append(eres)
-        return ret_res, results
+                ret_divs.append(results[i])
+        return ret_res, ret_divs
 
     def _extract_result(self, result):
         title, url = self._extract_title_url(result)

@@ -16,9 +16,24 @@ current_links = []
 current_title_and_desc = []
 current_object = ""
 
-#def fetch_latest_query():
-
-
+def prune_divs(links, divs_):
+    divs = []
+    links_index = 0
+    for i in range(len(divs_)):
+        if len(divs) == 10:
+            break
+        for descendant in divs_[i].descendants:
+            if descendant != "" and descendant != " " and not isinstance(descendant, bs4.element.NavigableString) and descendant.has_attr('href'):
+                if descendant['href'] == links[links_index].url or links[links_index].url in descendant['href']:
+                    descendant['href'] = '#'
+                    divs.append(descendant)
+                    links_index += 1
+                    break
+                else:
+                    print(descendant['href'], links[links_index].url)
+        else:
+            print("Pruned a div\n")
+    return divs
 
 def clean_title_and_desc(title, desc):
     title_ = title.lower().strip()
@@ -27,8 +42,34 @@ def clean_title_and_desc(title, desc):
     desc_ = re.sub(r'[^a-zA-Z0-9]', '', desc_)
     return title_, desc_
 
+def set_links_title_desc(results, divs):
+    str_divs = []
+    global current_links
+    global current_title_and_desc
+    current_links.clear()
+    current_title_and_desc.clear()
+    for i in range(len(results)):
+        print(results[i].url)
+        if (results[i].url[0] == '/'):
+            continue
+        current_links.append(results[i].url)
+        current_title_and_desc.append(clean_title_and_desc(results[i].title, results[i].desc))
+        for descendant in divs[i].descendants:
+            if descendant != "" and descendant != " " and not isinstance(descendant, bs4.element.NavigableString) and descendant.has_attr('href'):
+                descendant['href'] = current_links[-1]
+                descendant['target'] = "_blank"
+                descendant['rel'] = 'noopener noreferrer'
+                #descendant['href'] = '#'
+        str_divs.append(divs[i])
+        #print("Title:", current_title_and_desc[-1][0])
+        #print("Desc:", current_title_and_desc[-1][1])
+        if len(current_links) >=10:
+            break
+    return str_divs
+                    
 
-def download_urls(links):
+
+'''def download_urls(links):
     for i in range(len(links)):
         headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
         webContent = requests.get(links[i], headers=headers).content.decode()
@@ -41,7 +82,7 @@ def download_urls(links):
         contents = '{% verbatim myblock %}' + str(soup) + '{% endverbatim myblock %}'
         with open('./search/templates/search/url' + str(i) + '.html', 'w') as f:
             f.write(contents)
-        print("Downloaded", links[i])
+        print("Downloaded", links[i])'''
 
 
 
@@ -73,26 +114,10 @@ def edit(request, annotation): #this is submitting annotations
             try:
                 gs = GoogleSearch(current_queries[0])
                 gs.results_per_page = 15
-                results, divs = gs.get_results()
-                for i in range(len(divs)):
-                    for descendant in divs[i].descendants:
-                        if descendant != "" and descendant != " " and not isinstance(descendant, bs4.element.NavigableString) and descendant.has_attr('href'):
-                            descendant['href'] = '#'
-                    
-                str_divs = [str(x) for x in divs]
-                current_links.clear()
-                current_title_and_desc.clear()
-                for result in results:
-                    if (result.url[0] == '/'):
-                        continue
-                    current_links.append(result.url)
-                    current_title_and_desc.append(clean_title_and_desc(result.title, result.desc))
-                    print("Title:", current_title_and_desc[-1][0])
-                    print("Desc:", current_title_and_desc[-1][1])
-                    if len(current_links) >=10:
-                        break
-                    
-                print("num results:", len(current_links))
+                results, divs = gs.get_results()    
+                str_divs_ = set_links_title_desc(results, divs)
+                str_divs = [str(x) for x in str_divs_]
+                
                 #download_urls(current_links)
             except SearchError:
                 return render(request, 'search/home.html') #probably change this to call edit() again
@@ -129,34 +154,10 @@ def handle_input(request):
                 global current_links
                 try:
                     gs = GoogleSearch(current_queries[0])
-                    gs.results_per_page = 11
-                    results, divs_ = gs.get_results()
-                    divs = []
-                    for i in range(len(divs_)):
-                        if not divs_[i].find('div', class_='H5U6Eb'): #images
-                            divs.append(divs_[i])
-                        
-                        for descendant in divs[-1].descendants:
-                            if descendant != "" and descendant != " " and not isinstance(descendant, bs4.element.NavigableString) and descendant.has_attr('href'):
-                                descendant['href'] = '#'
-                    if len(divs) > 10:
-                        del divs[-1]
-                        
-                    str_divs = [str(x) for x in divs]
-                    current_links.clear()
-                    current_title_and_desc.clear()
-                    for result in results:
-                        print(result.url)
-                        if (result.url[0] == '/'):
-                            continue
-                        current_links.append(result.url)
-                        current_title_and_desc.append(clean_title_and_desc(result.title, result.desc))
-                        #print("Title:", current_title_and_desc[-1][0])
-                        #print("Desc:", current_title_and_desc[-1][1])
-                        if len(current_links) >=10:
-                            break
-                    
-                    print("num results:", len(current_links))
+                    gs.results_per_page = 15
+                    results, divs = gs.get_results()    
+                    str_divs_ = set_links_title_desc(results, divs)
+                    str_divs = [str(x) for x in str_divs_]
                     #download_urls(current_links)
                 except SearchError:
                     return render(request, 'search/home.html')
@@ -164,24 +165,3 @@ def handle_input(request):
 
                 return render(request, 'search/iframe_page.html', {'links': current_links, 'stats_local': [current_object, 'N/A', 'N/A', 'N/A', 'N/A', 'N/A'], 'divs': str_divs})
     return render(request, 'search/home.html') #form failed
-
-def url0(request):
-    return render(request, 'search/url0.html')
-def url1(request):
-    return render(request, 'search/url1.html')
-def url2(request):
-    return render(request, 'search/url2.html')
-def url3(request):
-    return render(request, 'search/url3.html')
-def url4(request):
-    return render(request, 'search/url4.html')
-def url5(request):
-    return render(request, 'search/url5.html')
-def url6(request):
-    return render(request, 'search/url6.html')
-def url7(request):
-    return render(request, 'search/url7.html')
-def url8(request):
-    return render(request, 'search/url8.html')
-def url9(request):
-    return render(request, 'search/url9.html')
