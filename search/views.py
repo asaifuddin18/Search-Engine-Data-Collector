@@ -129,17 +129,19 @@ def handle_input(request):
                 global current_links
                 try:
                     gs = GoogleSearch(current_queries[0])
-                    gs.results_per_page = 10
-                    results, divs = gs.get_results()
-                    for i in range(len(divs)):
-                        if divs[i].find('div', class_='H5U6Eb'): #images
-                            del divs[i]
-                            i -= 1
-                            continue
-                        for descendant in divs[i].descendants:
+                    gs.results_per_page = 11
+                    results, divs_ = gs.get_results()
+                    divs = []
+                    for i in range(len(divs_)):
+                        if not divs_[i].find('div', class_='H5U6Eb'): #images
+                            divs.append(divs_[i])
+                        
+                        for descendant in divs[-1].descendants:
                             if descendant != "" and descendant != " " and not isinstance(descendant, bs4.element.NavigableString) and descendant.has_attr('href'):
                                 descendant['href'] = '#'
-                    
+                    if len(divs) > 10:
+                        del divs[-1]
+                        
                     str_divs = [str(x) for x in divs]
                     current_links.clear()
                     current_title_and_desc.clear()

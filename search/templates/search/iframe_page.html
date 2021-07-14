@@ -120,21 +120,21 @@
 
   <div class="b-example-divider"></div>
   <div class="container">
-    <div class="row">
-      <div class="col-1"><!--TL Column-->
-        
+    {% for d in divs %}
+    <div class="row justify-content-start">
+      <div class="col-1">
+        <button type="button" id="y{{forloop.counter}}" class="btn btn-primary">Homepage</button>
       </div>
-      <div class="col-10"><!--TM Column-->
-        <div class="progress">
-          <div class="progress-bar" id="progressbar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-        </div>
-        {% for d in divs %}
+      <div class="col-10">
         {{d|safe}}
-        {% endfor %}
       </div>
-      <div class="col-1"><!--TR Column-->
-        <button type="button" id="submit_annotation" class="btn btn-primary">Submit</button>
+      <div class="col-1">
+        <button type="button" id="n{{forloop.counter}}" class="btn btn-primary">Not Homepage</button>
       </div>
+    </div>
+    {% endfor %}
+    <div class="row justify-content-start">
+      <button type="button" id="submit_annotation" class="btn btn-primary">Submit</button>
     </div>
   </div>
 </main>

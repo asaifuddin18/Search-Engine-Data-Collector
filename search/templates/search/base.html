@@ -1,4 +1,5 @@
-{% load static %}
+
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -16,7 +17,7 @@
     <!-- Bootstrap core CSS -->
     <!-- Bootstrap core CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
-<link href="{% static 'search/iframe_page.css' %}" rel="stylesheet">
+<link href="/static/search/iframe_page.css" rel="stylesheet">
 
     <style>
       .bd-placeholder-img {
@@ -36,9 +37,10 @@
 
     
     <!-- Custom styles for this template -->
-    <link href="{% static 'search/iframe_page.html' %}" rel="stylesheet">
+    <link href="/static/search/iframe_page.html" rel="stylesheet">
   </head>
   <body>
+    <style>.ezO2md{border:thin solid #dadce0;padding:12px 16px 12px 16px;margin-bottom:10px;font-family:Roboto,Helvetica,Arial,sans-serif}.lIMUZd{font-family:Roboto,Helvetica,Arial,sans-serif}.h05j6b{padding-bottom:12px}.BhZo9{border-collapse:collapse;border-spacing:0;width:100%}.T7QDIc{margin-top:12px}.szkQOb{display:block;float:right;padding-left:16px}.zBgUmc{clear:both}.M1Tmcc{padding-top:12px}.fYyStc{word-break:break-word}.ynsChf{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.Fj3V3b{color:#1967D2;font-size:14px;line-height:20px}.FrIlee{color:#202124;font-size:13px;line-height:20px}.F9iS2e{color:#70757a;font-size:13px;line-height:20px}.WMQ2Le{color:#70757a;font-size:12px;line-height:16px}.x3G5ab{color:#202124;font-size:18px;line-height:24px}.fuLhoc{color:#1967D2;font-size:18px;line-height:24px}.epoveb{font-size:32px;line-height:40px;font-weight:400;color:#202124}.dXDvrc{color:#0d652d;font-size:14px;line-height:20px;word-wrap:break-word}.dloBPe{font-weight:bold}.YVIcad{color:#70757a}.JkVVdd{color:#ea4335}.oXZRFd{color:#ea4335}.MQHtg{color:#fbbc04}.pyMRrb{color:#1e8e3e}.EtTZid{color:#1e8e3e}.M3vVJe{color:#1967D2}.qXLe6d{display:block}.NHQNef{font-style:italic}.Cb8Z7c{white-space:pre}a.ZWRArf{text-decoration:none}a .CVA68e:hover{text-decoration:underline}.BhZo9 td{padding-top:0;padding-bottom:0;padding-right:8px}.BhZo9 .inq5Bd{padding-right:0}.iegPM{vertical-align:top}.nuiMpb{text-align:left}.GuUxQ{text-align:center}.mfvA7{text-align:right}.hcz0vb{float:left;margin-right:8px}.KQfzZe{height:4px}.YgS6de{width:100%}.OWPbab{border-spacing:0;width:100%}.f3hb4{vertical-align:top;width:100%}.c4ImMc{padding-bottom:8px}.TYvcTb{margin:0}.RFi43d{padding-top:12px}.H5U6Eb{width:100%;padding-top:12px}.UoE3xe{display:inline-block;padding:2px;padding-bottom:4px}.IGO2bd{vertical-align:bottom}.cnjbFd{display:block;padding-top:12px}.SAvc1d{border-spacing:0;width:100%;table-layout:auto;padding:4px 0 4px 0}.Z4Pjr{text-align:right}</style>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
@@ -80,37 +82,37 @@
       <li class="nav-item">
         <a href="#" class="nav-link text-white" aria-current="page" id="object">
           <svg class="bi me-2" width="16" height="16"><use xlink:href="#home"/></svg>
-          Object: {{stats_local.0}}
+          Object: ipad
         </a>
       </li>
       <li>
         <a href="#" class="nav-link text-white">
           <svg class="bi me-2" width="16" height="16"><use xlink:href="#speedometer2"/></svg>
-          Accuracy {{stats_local.1}}
+          Accuracy N/A
         </a>
       </li>
       <li>
         <a href="#" class="nav-link text-white">
           <svg class="bi me-2" width="16" height="16"><use xlink:href="#table"/></svg>
-          Recall: {{stats_local.2}}
+          Recall: N/A
         </a>
       </li>
       <li>
         <a href="#" class="nav-link text-white">
           <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"/></svg>
-          Specificity: {{stats_local.3}}
+          Specificity: N/A
         </a>
       </li>
       <li>
         <a href="#" class="nav-link text-white">
           <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
-          Precision: {{stats_local.4}}
+          Precision: N/A
         </a>
       </li>
       <li>
         <a href="#" class="nav-link text-white">
           <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
-          F1 Score: {{stats_local.5}}
+          F1 Score: N/A
         </a>
       </li>
     </ul>
@@ -119,26 +121,146 @@
 
   <div class="b-example-divider"></div>
   <div class="container">
-    <div class="row">
-      <div class="col-1"><!--TL Column-->
-        <button type="button" id="notHomepage" class="btn btn-primary">Back</button>
+    <div class="progress">
+      <div class="progress-bar" id="progressbar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+    
+    <div class="row justify-content-start">
+      <div class="col-1">
+        <button type="button" id="y1" class="btn btn-primary">Homepage</button>
       </div>
-      <div class="col-11"><!--TM Column-->
-        <div class="progress">
-          <div class="progress-bar" id="progressbar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-        </div>
-        <iframe src="{% url 'url0' %}" sandbox="allow-popups-to-escape-sandbox allow-modals allow-forms allow-popups allow-pointer-lock allow-same-origin allow-scripts" id="iframe" title="Iframe Viewer" style="width:100%" height=950></iframe>
+      <div class="col-10">
+        <div class="ezO2md"><div> <div> <a href="#"> <span class="CVA68e qXLe6d"> <span class="qXLe6d x3G5ab"> <span class="fYyStc">iPad (5th generation)</span> </span> </span> </a> <div> <table class="BhZo9"> <thead> <tr> <td class="iegPM nuiMpb"> <div class="T7QDIc"> <span class="qXLe6d FrIlee WMQ2Le"> <span>iPad 5th generation in silver</span> </span> </div> </td><td class="iegPM inq5Bd nuiMpb"> <div class="T7QDIc"> <span class="qXLe6d FrIlee WMQ2Le"> <span></span> </span> </div> </td> </tr> </thead> <tbody> <tr> <td class="iegPM nuiMpb"> <div class="T7QDIc"> <span class="qXLe6d FrIlee"> <span class="fYyStc">Dimensions</span> </span> </div> </td><td class="iegPM inq5Bd nuiMpb"> <div class="T7QDIc"> <span class="qXLe6d FrIlee"> <span class="fYyStc">240 mm (9.4 in) (h) 169.5 mm (6.67 in) (w) 7.5 mm (0.30 in) (d)</span> </span> </div> </td> </tr><tr> <td class="iegPM nuiMpb"> <div class="T7QDIc"> <span class="qXLe6d FrIlee"> <span class="fYyStc">Mass</span> </span> </div> </td><td class="iegPM inq5Bd nuiMpb"> <div class="T7QDIc"> <span class="qXLe6d FrIlee"> <span class="fYyStc">Wi-Fi: 469 g (1.034 lb) Wi-Fi + Cellular: 478 g (1.054 lb)</span> </span> </div> </td> </tr><tr> <td class="iegPM nuiMpb"> <div class="T7QDIc"> <span class="qXLe6d FrIlee"> <span class="fYyStc">Predecessor</span> </span> </div> </td><td class="iegPM inq5Bd nuiMpb"> <div class="T7QDIc"> <span class="qXLe6d FrIlee"> <span class="fYyStc">iPad (4th generation)</span> </span> </div> </td> </tr><tr> <td class="iegPM nuiMpb"> <div class="T7QDIc"> <span class="qXLe6d FrIlee"> <span class="fYyStc">Successor</span> </span> </div> </td><td class="iegPM inq5Bd nuiMpb"> <div class="T7QDIc"> <span class="qXLe6d FrIlee"> <span class="fYyStc">iPad (6th generation)</span> </span> </div> </td> </tr> </tbody> </table> </div> <div class="M1Tmcc"> <div class="KQfzZe"></div> <div> <a href="#"> <div> <div> <span class="qXLe6d FrIlee"> <span class="fYyStc M3vVJe fuLhoc">iPad (5th generation) - Wikipedia</span> </span> </div> <span class="qXLe6d dXDvrc"> <span class="fYyStc">en.wikipedia.org › wiki › IPad_(5th_generation)</span> </span> </div> </a> <div class="T7QDIc"> <span class="qXLe6d F9iS2e WMQ2Le"> <a class="M3vVJe" href="#">About Featured Snippets</a> </span> </div> </div> </div> </div> </div></div>
+      </div>
+      <div class="col-1">
+        <button type="button" id="n1" class="btn btn-primary">Not Homepage</button>
       </div>
     </div>
+
+    <div class="row justify-content-start">
+      <div class="col-1">
+        <button type="button" id="y2" class="btn btn-primary">Homepage</button>
+      </div>
+      <div class="col-10">
+        <div class="ezO2md"><div><div><a class="fuLhoc ZWRArf" href="#"><span class="CVA68e qXLe6d">iPad Dimensions – Length, Width, Height and Weight of ... - iPadable</span> <span class="qXLe6d dXDvrc"> <span class="fYyStc">ipadable.com › ipad-dimensions-length-width-height-weight-ipad-models</span> </span> </a></div><div class="YgS6de"><table class="OWPbab"><tr><td class="f3hb4"><div> <div> <span class="qXLe6d FrIlee"> <span class="fYyStc">This new iPad retained the size 9.7 inches display size(250 mm) and also the LED back-lighting technology, plus fingerprint and scratch resistant coating. Random ...</span> <span class="fYyStc">
+        </span> <a class="M3vVJe" href="#">iPad 2</a> <span class="fYyStc"> · </span> <a class="M3vVJe" href="#">iPad 3</a> <span class="fYyStc"> · </span> <a class="M3vVJe" href="#">iPad 4</a> <span class="fYyStc"> · </span> <a class="M3vVJe" href="#">iPad Mini</a> </span> </div> </div></td></tr></table></div></div></div>
+      </div>
+      <div class="col-1">
+        <button type="button" id="n2" class="btn btn-primary">Not Homepage</button>
+      </div>
+    </div>
+
+    <div class="row justify-content-start">
+      <div class="col-1">
+        <button type="button" id="y3" class="btn btn-primary">Homepage</button>
+      </div>
+      <div class="col-10">
+        <div class="ezO2md"><div><div><a class="fuLhoc ZWRArf" href="#"><span class="CVA68e qXLe6d">iPad Dimensions – Length, Width, Height and Weight of ... - iPadable</span> <span class="qXLe6d dXDvrc"> <span class="fYyStc">ipadable.com › ipad-dimensions-length-width-height-weight-ipad-models</span> </span> </a></div><div class="YgS6de"><table class="OWPbab"><tr><td class="f3hb4"><div> <div> <span class="qXLe6d FrIlee"> <span class="fYyStc">This new iPad retained the size 9.7 inches display size(250 mm) and also the LED back-lighting technology, plus fingerprint and scratch resistant coating. Random ...</span> <span class="fYyStc">
+        </span> <a class="M3vVJe" href="#">iPad 2</a> <span class="fYyStc"> · </span> <a class="M3vVJe" href="#">iPad 3</a> <span class="fYyStc"> · </span> <a class="M3vVJe" href="#">iPad 4</a> <span class="fYyStc"> · </span> <a class="M3vVJe" href="#">iPad Mini</a> </span> </div> </div></td></tr></table></div></div></div>
+      </div>
+      <div class="col-1">
+        <button type="button" id="n3" class="btn btn-primary">Not Homepage</button>
+      </div>
+    </div>
+
+    <div class="row justify-content-start">
+      <div class="col-1">
+        <button type="button" id="y4" class="btn btn-primary">Homepage</button>
+      </div>
+      <div class="col-10">
+        <div class="ezO2md"><div><div><a class="fuLhoc ZWRArf" href="#"><span class="CVA68e qXLe6d">iPad Dimensions – Length, Width, Height and Weight of ... - iPadable</span> <span class="qXLe6d dXDvrc"> <span class="fYyStc">ipadable.com › ipad-dimensions-length-width-height-weight-ipad-models</span> </span> </a></div><div class="YgS6de"><table class="OWPbab"><tr><td class="f3hb4"><div> <div> <span class="qXLe6d FrIlee"> <span class="fYyStc">This new iPad retained the size 9.7 inches display size(250 mm) and also the LED back-lighting technology, plus fingerprint and scratch resistant coating. Random ...</span> <span class="fYyStc">
+        </span> <a class="M3vVJe" href="#">iPad 2</a> <span class="fYyStc"> · </span> <a class="M3vVJe" href="#">iPad 3</a> <span class="fYyStc"> · </span> <a class="M3vVJe" href="#">iPad 4</a> <span class="fYyStc"> · </span> <a class="M3vVJe" href="#">iPad Mini</a> </span> </div> </div></td></tr></table></div></div></div>
+      </div>
+      <div class="col-1">
+        <button type="button" id="n4" class="btn btn-primary">Not Homepage</button>
+      </div>
+    </div>
+
+    <div class="row justify-content-start">
+      <div class="col-1">
+        <button type="button" id="y5" class="btn btn-primary">Homepage</button>
+      </div>
+      <div class="col-10">
+        <div class="ezO2md"><div><div><a class="fuLhoc ZWRArf" href="#"><span class="CVA68e qXLe6d">iPad Dimensions – Length, Width, Height and Weight of ... - iPadable</span> <span class="qXLe6d dXDvrc"> <span class="fYyStc">ipadable.com › ipad-dimensions-length-width-height-weight-ipad-models</span> </span> </a></div><div class="YgS6de"><table class="OWPbab"><tr><td class="f3hb4"><div> <div> <span class="qXLe6d FrIlee"> <span class="fYyStc">This new iPad retained the size 9.7 inches display size(250 mm) and also the LED back-lighting technology, plus fingerprint and scratch resistant coating. Random ...</span> <span class="fYyStc">
+        </span> <a class="M3vVJe" href="#">iPad 2</a> <span class="fYyStc"> · </span> <a class="M3vVJe" href="#">iPad 3</a> <span class="fYyStc"> · </span> <a class="M3vVJe" href="#">iPad 4</a> <span class="fYyStc"> · </span> <a class="M3vVJe" href="#">iPad Mini</a> </span> </div> </div></td></tr></table></div></div></div>
+      </div>
+      <div class="col-1">
+        <button type="button" id="n5" class="btn btn-primary">Not Homepage</button>
+      </div>
+    </div>
+
+    <div class="row justify-content-start">
+      <div class="col-1">
+        <button type="button" id="y6" class="btn btn-primary">Homepage</button>
+      </div>
+      <div class="col-10">
+        <div class="ezO2md"><div><div><a class="fuLhoc ZWRArf" href="#"><span class="CVA68e qXLe6d">iPad Dimensions – Length, Width, Height and Weight of ... - iPadable</span> <span class="qXLe6d dXDvrc"> <span class="fYyStc">ipadable.com › ipad-dimensions-length-width-height-weight-ipad-models</span> </span> </a></div><div class="YgS6de"><table class="OWPbab"><tr><td class="f3hb4"><div> <div> <span class="qXLe6d FrIlee"> <span class="fYyStc">This new iPad retained the size 9.7 inches display size(250 mm) and also the LED back-lighting technology, plus fingerprint and scratch resistant coating. Random ...</span> <span class="fYyStc">
+        </span> <a class="M3vVJe" href="#">iPad 2</a> <span class="fYyStc"> · </span> <a class="M3vVJe" href="#">iPad 3</a> <span class="fYyStc"> · </span> <a class="M3vVJe" href="#">iPad 4</a> <span class="fYyStc"> · </span> <a class="M3vVJe" href="#">iPad Mini</a> </span> </div> </div></td></tr></table></div></div></div>
+      </div>
+      <div class="col-1">
+        <button type="button" id="n6" class="btn btn-primary">Not Homepage</button>
+      </div>
+    </div>
+
+    <div class="row justify-content-start">
+      <div class="col-1">
+        <button type="button" id="y7" class="btn btn-primary">Homepage</button>
+      </div>
+      <div class="col-10">
+        <div class="ezO2md"><div><div><a class="fuLhoc ZWRArf" href="#"><span class="CVA68e qXLe6d">iPad Dimensions – Length, Width, Height and Weight of ... - iPadable</span> <span class="qXLe6d dXDvrc"> <span class="fYyStc">ipadable.com › ipad-dimensions-length-width-height-weight-ipad-models</span> </span> </a></div><div class="YgS6de"><table class="OWPbab"><tr><td class="f3hb4"><div> <div> <span class="qXLe6d FrIlee"> <span class="fYyStc">This new iPad retained the size 9.7 inches display size(250 mm) and also the LED back-lighting technology, plus fingerprint and scratch resistant coating. Random ...</span> <span class="fYyStc">
+        </span> <a class="M3vVJe" href="#">iPad 2</a> <span class="fYyStc"> · </span> <a class="M3vVJe" href="#">iPad 3</a> <span class="fYyStc"> · </span> <a class="M3vVJe" href="#">iPad 4</a> <span class="fYyStc"> · </span> <a class="M3vVJe" href="#">iPad Mini</a> </span> </div> </div></td></tr></table></div></div></div>
+      </div>
+      <div class="col-1">
+        <button type="button" id="n7" class="btn btn-primary">Not Homepage</button>
+      </div>
+    </div>
+
+    <div class="row justify-content-start">
+      <div class="col-1">
+        <button type="button" id="y8" class="btn btn-primary">Homepage</button>
+      </div>
+      <div class="col-10">
+        <div class="ezO2md"><div><div><a class="fuLhoc ZWRArf" href="#"><span class="CVA68e qXLe6d">iPad Dimensions – Length, Width, Height and Weight of ... - iPadable</span> <span class="qXLe6d dXDvrc"> <span class="fYyStc">ipadable.com › ipad-dimensions-length-width-height-weight-ipad-models</span> </span> </a></div><div class="YgS6de"><table class="OWPbab"><tr><td class="f3hb4"><div> <div> <span class="qXLe6d FrIlee"> <span class="fYyStc">This new iPad retained the size 9.7 inches display size(250 mm) and also the LED back-lighting technology, plus fingerprint and scratch resistant coating. Random ...</span> <span class="fYyStc">
+        </span> <a class="M3vVJe" href="#">iPad 2</a> <span class="fYyStc"> · </span> <a class="M3vVJe" href="#">iPad 3</a> <span class="fYyStc"> · </span> <a class="M3vVJe" href="#">iPad 4</a> <span class="fYyStc"> · </span> <a class="M3vVJe" href="#">iPad Mini</a> </span> </div> </div></td></tr></table></div></div></div>
+      </div>
+      <div class="col-1">
+        <button type="button" id="n8" class="btn btn-primary">Not Homepage</button>
+      </div>
+    </div>
+
+    <div class="row justify-content-start">
+      <div class="col-1">
+        <button type="button" id="y9" class="btn btn-primary">Homepage</button>
+      </div>
+      <div class="col-10">
+        <div class="ezO2md"><div><div><a class="fuLhoc ZWRArf" href="#"><span class="CVA68e qXLe6d">iPad Dimensions – Length, Width, Height and Weight of ... - iPadable</span> <span class="qXLe6d dXDvrc"> <span class="fYyStc">ipadable.com › ipad-dimensions-length-width-height-weight-ipad-models</span> </span> </a></div><div class="YgS6de"><table class="OWPbab"><tr><td class="f3hb4"><div> <div> <span class="qXLe6d FrIlee"> <span class="fYyStc">This new iPad retained the size 9.7 inches display size(250 mm) and also the LED back-lighting technology, plus fingerprint and scratch resistant coating. Random ...</span> <span class="fYyStc">
+        </span> <a class="M3vVJe" href="#">iPad 2</a> <span class="fYyStc"> · </span> <a class="M3vVJe" href="#">iPad 3</a> <span class="fYyStc"> · </span> <a class="M3vVJe" href="#">iPad 4</a> <span class="fYyStc"> · </span> <a class="M3vVJe" href="#">iPad Mini</a> </span> </div> </div></td></tr></table></div></div></div>
+      </div>
+      <div class="col-1">
+        <button type="button" id="n9" class="btn btn-primary">Not Homepage</button>
+      </div>
+    </div>
+
+    <div class="row justify-content-start">
+      <div class="col-1">
+        <button type="button" id="y10" class="btn btn-primary">Homepage</button>
+      </div>
+      <div class="col-10">
+        <div class="ezO2md"><div><div><a class="fuLhoc ZWRArf" href="#"><span class="CVA68e qXLe6d">iPad Dimensions – Length, Width, Height and Weight of ... - iPadable</span> <span class="qXLe6d dXDvrc"> <span class="fYyStc">ipadable.com › ipad-dimensions-length-width-height-weight-ipad-models</span> </span> </a></div><div class="YgS6de"><table class="OWPbab"><tr><td class="f3hb4"><div> <div> <span class="qXLe6d FrIlee"> <span class="fYyStc">This new iPad retained the size 9.7 inches display size(250 mm) and also the LED back-lighting technology, plus fingerprint and scratch resistant coating. Random ...</span> <span class="fYyStc">
+        </span> <a class="M3vVJe" href="#">iPad 2</a> <span class="fYyStc"> · </span> <a class="M3vVJe" href="#">iPad 3</a> <span class="fYyStc"> · </span> <a class="M3vVJe" href="#">iPad 4</a> <span class="fYyStc"> · </span> <a class="M3vVJe" href="#">iPad Mini</a> </span> </div> </div></td></tr></table></div></div></div>
+      </div>
+      <div class="col-1">
+        <button type="button" id="n10" class="btn btn-primary">Not Homepage</button>
+      </div>
+    </div>
+
   </div>
 </main>
 
 
-    <script src="{% static 'search/sidebars.js' %}"></script>
-    {{ links|json_script:"links" }}
-    {% if labels %}
-    {{labels|json_script:"labels"}}
-    {% endif %}
-    <script src="{% static 'search/iframe_page.js' %}"></script>
+    <script src="/static/search/sidebars.js"></script>
+    <script id="links" type="application/json">["https://en.wikipedia.org/wiki/IPad_(5th_generation)", "https://ipadable.com/ipad-dimensions-length-width-height-weight-ipad-models/", "https://www.lifewire.com/how-big-is-ipad-weight-1994316", "https://www.dimensions.com/collection/apple-ipad", "https://www.apple.com/ipad-10.2/specs/", "https://ebookfriendly.com/apple-ipad-dimensions/", "https://www.pinterest.com/pin/148126275228966560/", "https://www.oberondesign.com/pages/ipad-identification", "https://forums.macrumors.com/threads/width-and-length-of-the-ipad-2-screen-cm.1220404/", "https://www.mac-case.com/blogs/news/how-to-measure-an-ipad-for-a-case"]</script>
+    
+    <script src="/static/search/iframe_page.js"></script>
   </body>
 </html>

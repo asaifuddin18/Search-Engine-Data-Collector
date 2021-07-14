@@ -10,6 +10,12 @@ The webite uses the Django framework along with Bootstrap for frontend.
 
 
 ## TODO
-Replace iFrame with raw HTML
+Add links back into Google search result Divs
 
-Fix xgoogle so it properly gets the description
+Add search query templates
+
+Remove "Images" and "Related Searches"
+
+Allow user to download dataset
+
+Improve ML model by implementing tf.mi
