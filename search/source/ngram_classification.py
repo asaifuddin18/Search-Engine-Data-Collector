@@ -7,13 +7,12 @@ from sklearn.ensemble import RandomForestClassifier
 from urllib.parse import urlparse
 from .symmetric_dict import SymmetricDict
 from string import ascii_lowercase
+import math
 
 class NgramClassification:
     """
     Class used to organize data and make predictions using a Random Forest
-
     ...
-
     Attributes
     ----------
     features : list of strings
@@ -29,7 +28,6 @@ class NgramClassification:
     
     Methods
     -------
-
     """
     def __init__(self) -> None:
         self.features = []
@@ -50,7 +48,6 @@ class NgramClassification:
     def __generate_trigrams(self, formatted_url, description, title) -> list():
         """
         Helper function that constructs the tri-grams required for feature generation
-
         Parameters
         ----------
         formatted_url: str
@@ -59,7 +56,6 @@ class NgramClassification:
             The text snippet that google provides under the URL in a google search
         title: str
             The text that appears hyperlinked
-
         Returns
         list
             A list of strings of the tri-grams generated from the url
@@ -77,7 +73,6 @@ class NgramClassification:
     def __construct_features(self, url, description, object, title) -> list():
         """
         Helper function that constructs the features required for the Random Forest
-
         Parameters
         ----------
         url: str
@@ -86,7 +81,6 @@ class NgramClassification:
             The text snippet that google provides under the URL in a google search
         title: str
             The text that appears hyperlinked
-
         Returns
         -------
         list
@@ -135,16 +129,16 @@ class NgramClassification:
     def generate_random_forest(self) -> dict:
         """
         Function that trains and tests Random Forest
-
         Returns
         -------
         dict
             A dictionary containing the following keys: recall, specificity, precision, accuracy, f1
         """
 
-        data = pd.get_dummies(self.df) #probably have to do the same with labels
-        features = np.array(data)
-        train_features, test_features, train_labels, test_labels = train_test_split(features, self.labels, test_size = .2) #Is this too expensive?
+        #data = pd.get_dummies(self.df) #probably have to do the same with labels
+        features = np.array(self.df)
+        tf_mi_features = self.tf_mi_array(features)
+        train_features, test_features, train_labels, test_labels = train_test_split(tf_mi_features, self.labels, test_size = .2) #Is this too expensive?
         rf = RandomForestClassifier()
         rf.fit(train_features, train_labels)
 
@@ -204,7 +198,6 @@ class NgramClassification:
     def predict(self, urls, snippets, object, titles) -> list():
         """
         Creates predictions based on input URLs
-
         Parameters
         ----------
         urls: list
@@ -213,7 +206,6 @@ class NgramClassification:
             A list of strings that are the descriptions google returns alongside URLs on search queries
         titles: list
             A list of titles that are hyperlinked to the URL returned upon search queries
-
         Returns
         -------
         list:
@@ -229,11 +221,13 @@ class NgramClassification:
         for i in range(len(urls)):
             data_test.append(self.__construct_features(urls[i], snippets[i], object, titles[i]))
         data_test = np.array(data_test)
-        data_train = np.asarray(self.df)
+        data_train = np.array(self.df)
+        data_test_tf_mi = self.tf_mi_array(data_test)
+        data_train_tf_mi = self.tf_mi_array(data_train)
         rf = RandomForestClassifier()
 
-        rf.fit(data_train, self.labels)
-        predictions = rf.predict(data_test)
+        rf.fit(data_train_tf_mi, self.labels)
+        predictions = rf.predict(data_test_tf_mi)
         pred_string = []
         for num in predictions:
             if num not in self.sd:
@@ -243,6 +237,50 @@ class NgramClassification:
 
 
 
+    """
+        Creates tf.mi array
+        Parameters
+        ----------
+        arr: np.array
+            The numpy array given when converting the pandas term-frequency dataframe into a numpy array
+        Returns
+        -------
+        np.array:
+            A numpy array of same dimensions of the input array except with tf.mi values filled in
+        """
+    def tf_mi_array(self, arr):
+        num_class = [0]*self.idx
+        for label in self.labels:
+            num_class[label] += 1
+        
 
+        freq_array = np.zeros((self.idx, 17576*3, 4)) #0th dim = class, 1st dim = tri-gram, 2nd dim = a,b,c,d
 
-    
+        for i in range(len(arr)):
+            for j in range(len(arr[i])):
+                if arr[i][j] != 0:
+                    freq_array[self.labels[i]][j][0] += 1 #a
+                    temp = np.arange(self.idx)
+                    temp = np.delete(temp, self.labels[i])
+                    freq_array[temp][j][2] += 1 #c
+                else:
+                    freq_array[self.labels[i]][j][1] += 1 #b
+                    temp = np.arange(self.idx)
+                    temp = np.delete(temp, self.labels[i])
+                    freq_array[temp][j][3] += 1 #d
+
+        tf_mi_arr = np.array((len(arr), len(arr[0])))
+        for i in range(len(arr)):
+            for j in range(len(arr[i])):
+                a = freq_array[self.labels[i]][j][0]
+                c = freq_array[self.labels[i]][j][2]
+                n1 = self.labels.count(self.labels[i])
+                n2 = len(self.labels) - n1
+                n = len(self.labels)
+                v1 = (a*n)/((a+c)*n1)
+                v2 = (c*n)/((a+c)*n2)
+                tf_mi_arr[i][j] = math.log2(max(v1, v2))*arr[i][j]
+        return tf_mi_arr
+
+                
+
