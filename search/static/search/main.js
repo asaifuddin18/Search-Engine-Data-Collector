@@ -14,4 +14,8 @@ window.onload = function() {
             your_object.value = event.target.id;
         })
     }
+    document.getElementById("download_dataset").addEventListener("click", function(event) {
+        alert('hi');
+        document.location.href = "/download_dataset";
+    })
 }

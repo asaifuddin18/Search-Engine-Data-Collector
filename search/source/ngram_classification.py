@@ -248,7 +248,7 @@ class NgramClassification:
         np.array:
             A numpy array of same dimensions of the input array except with tf.mi values filled in
         """
-    def tf_mi_array(self, arr):
+    def tf_mi_array(self, arr) -> np.array:
         num_class = [0]*self.idx
         for label in self.labels:
             num_class[label] += 1
@@ -262,14 +262,15 @@ class NgramClassification:
                     freq_array[self.labels[i]][j][0] += 1 #a
                     temp = np.arange(self.idx)
                     temp = np.delete(temp, self.labels[i])
-                    freq_array[temp][j][2] += 1 #c
-                else:
-                    freq_array[self.labels[i]][j][1] += 1 #b
-                    temp = np.arange(self.idx)
-                    temp = np.delete(temp, self.labels[i])
-                    freq_array[temp][j][3] += 1 #d
+                    #freq_array[temp][j][2] += 1 #c
+                    freq_array[temp,j,2] += 1 #c
+                #else:
+                    #freq_array[self.labels[i]][j][1] += 1 #b
+                    #temp = np.arange(self.idx)
+                    #temp = np.delete(temp, self.labels[i])
+                    #freq_array[temp,j,3] += 1 #d
 
-        tf_mi_arr = np.array((len(arr), len(arr[0])))
+        tf_mi_arr = np.zeros((len(arr), len(arr[0])))
         for i in range(len(arr)):
             for j in range(len(arr[i])):
                 a = freq_array[self.labels[i]][j][0]
@@ -277,10 +278,18 @@ class NgramClassification:
                 n1 = self.labels.count(self.labels[i])
                 n2 = len(self.labels) - n1
                 n = len(self.labels)
+                if a + c == 0 or (n1 == 0 and n2 == 0):
+                    tf_mi_arr[i][j] = 0
+                    continue
                 v1 = (a*n)/((a+c)*n1)
                 v2 = (c*n)/((a+c)*n2)
                 tf_mi_arr[i][j] = math.log2(max(v1, v2))*arr[i][j]
         return tf_mi_arr
+
+    def download_dataset(self) -> str:
+        path = "search/temp/temp.csv"
+        self.df.to_csv(path)
+        return path
 
                 
 

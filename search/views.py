@@ -165,3 +165,11 @@ def handle_input(request):
 
                 return render(request, 'search/iframe_page.html', {'links': current_links, 'stats_local': [current_object, 'N/A', 'N/A', 'N/A', 'N/A', 'N/A'], 'divs': str_divs})
     return render(request, 'search/home.html') #form failed
+
+
+def download(request):
+    path = rf.download_dataset()
+    response = HttpResponse(open(path, 'rb').read())
+    response['Content-Type'] = 'text/plain'
+    response['Content-Disposition'] = 'attachment; filename=search_dataset.csv'
+    return response

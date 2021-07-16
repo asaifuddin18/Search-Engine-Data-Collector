@@ -16,6 +16,12 @@ The webite uses the Django framework along with Bootstrap for frontend.
 
 ~~Remove "Images" and "Related Searches"~~
 
-Allow user to download dataset
+~~Allow user to download dataset~~
 
-Improve ML model by implementing tf.mi
+~~Improve ML model by implementing tf.mi~~
+
+Implement more ML models
+
+Implement tf.idf
+
+Allow user to change models/features through home page
