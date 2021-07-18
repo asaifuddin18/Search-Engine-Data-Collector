@@ -8,4 +8,5 @@ urlpatterns = [
     path('your-object/your-queries', views.handle_input, name='input'),
     path('test', views.test, name='test'),
     path('download_dataset', views.download, name='download'),
+    path('model/<str:model>/<str:features>', views.change_model, name='change_model'),
 ]

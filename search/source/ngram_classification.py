@@ -25,6 +25,10 @@ class NgramClassification:
         A symmetric dictionary so sd[k] = v == sd[v] = k
     idx: int
         The number of unique labels 1-indexed
+    model: str
+        The current type of model being used
+    feature: str
+        The current feature extraction method
     
     Methods
     -------
@@ -35,6 +39,8 @@ class NgramClassification:
         self.sd = SymmetricDict()
         self.sd[0] = "not_homepage"
         self.idx = 1
+        self.model = "Random Forest"
+        self.feature = "Term Frequency * Mutual Information"
         for c1 in ascii_lowercase:
             for c2 in ascii_lowercase:
                 for c3 in ascii_lowercase:
@@ -137,12 +143,21 @@ class NgramClassification:
 
         #data = pd.get_dummies(self.df) #probably have to do the same with labels
         features = np.array(self.df)
-        tf_mi_features = self.tf_mi_array(features)
-        train_features, test_features, train_labels, test_labels = train_test_split(tf_mi_features, self.labels, test_size = .2) #Is this too expensive?
-        rf = RandomForestClassifier()
-        rf.fit(train_features, train_labels)
-
-        inferences = rf.predict(test_features)
+        if self.feature == 'Term Frequency':
+            print('tf')
+            pass
+        elif self.feature == 'Term Frequency * Mutual Information':
+            features = self.tf_mi_array(features)
+            print('tf_mi')
+        
+        #tf_mi_features = self.tf_mi_array(features)
+        train_features, test_features, train_labels, test_labels = train_test_split(features, self.labels, test_size = .2) #Is this too expensive?
+        inferences = []
+        if self.model == 'Random Forest':
+            print('rf')
+            rf = RandomForestClassifier()
+            rf.fit(train_features, train_labels)
+            inferences = rf.predict(test_features)
 
         difference = test_labels - inferences #0 means either TP or TN, 1 means FN, -1 means FP
 
@@ -185,7 +200,7 @@ class NgramClassification:
             precision = 'N/A'
         else:
             precision = round(TP/(TP+FP), 2)
-        if precision == 'N/A' or recall == 'N/A':
+        if precision == 'N/A' or recall == 'N/A' or (precision == 0 and recall == 0):
             f1 = 'N/A'
         else:
             f1 = round(2*(precision * recall)/(precision + recall), 2)
@@ -222,22 +237,34 @@ class NgramClassification:
             data_test.append(self.__construct_features(urls[i], snippets[i], object, titles[i]))
         data_test = np.array(data_test)
         data_train = np.array(self.df)
-        data_test_tf_mi = self.tf_mi_array(data_test)
-        data_train_tf_mi = self.tf_mi_array(data_train)
-        rf = RandomForestClassifier()
+        if self.feature == 'Term Frequency':
+            print('tf')
+            pass
+        elif self.feature == 'Term Frequency * Mutual Information':
+            print('tf_mi')
+            data_test = self.tf_mi_array(data_test)
+            data_train = self.tf_mi_array(data_train)
+        #data_test_tf_mi = self.tf_mi_array(data_test)
+        #data_train_tf_mi = self.tf_mi_array(data_train)
+        inferences = []
+        if self.model == 'Random Forest':
+            print('rf')
+            rf = RandomForestClassifier()
+            rf.fit(data_train, self.labels)
+            inferences = rf.predict(data_test)
+        #rf = RandomForestClassifier()
 
-        rf.fit(data_train_tf_mi, self.labels)
-        predictions = rf.predict(data_test_tf_mi)
+        #rf.fit(data_train, self.labels)
+        #predictions = rf.predict(data_test)
         pred_string = []
-        for num in predictions:
+        for num in inferences:
             if num not in self.sd:
                 raise ValueError("Object not in symmetric dictionary on prediction")
             pred_string.append(self.sd[num])
         return pred_string
 
-
-
-    """
+    def tf_mi_array(self, arr) -> np.array:
+        """
         Creates tf.mi array
         Parameters
         ----------
@@ -248,7 +275,6 @@ class NgramClassification:
         np.array:
             A numpy array of same dimensions of the input array except with tf.mi values filled in
         """
-    def tf_mi_array(self, arr) -> np.array:
         num_class = [0]*self.idx
         for label in self.labels:
             num_class[label] += 1
@@ -287,9 +313,26 @@ class NgramClassification:
         return tf_mi_arr
 
     def download_dataset(self) -> str:
+        """
+        Downloads data to a CSV file (term frequency features)
+        Returns
+        -------
+        str:
+            A string to the path of the newly created file
+        """
         path = "search/temp/temp.csv"
         self.df.to_csv(path)
         return path
+
+    def is_empty(self) -> bool:
+        """
+        Checks to see if the classifier has no data
+        Returns
+        -------
+        bool:
+            True if there is no data, false otherwise
+        """
+        return len(self.labels) == 0
 
                 
 

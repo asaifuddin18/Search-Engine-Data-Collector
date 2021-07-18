@@ -16,7 +16,7 @@ current_links = []
 current_title_and_desc = []
 current_object = ""
 
-def prune_divs(links, divs_):
+'''def prune_divs(links, divs_):
     divs = []
     links_index = 0
     for i in range(len(divs_)):
@@ -33,7 +33,7 @@ def prune_divs(links, divs_):
                     print(descendant['href'], links[links_index].url)
         else:
             print("Pruned a div\n")
-    return divs
+    return divs'''
 
 def clean_title_and_desc(title, desc):
     title_ = title.lower().strip()
@@ -49,7 +49,7 @@ def set_links_title_desc(results, divs):
     current_links.clear()
     current_title_and_desc.clear()
     for i in range(len(results)):
-        print(results[i].url)
+        #print(results[i].url)
         if (results[i].url[0] == '/'):
             continue
         current_links.append(results[i].url)
@@ -59,10 +59,8 @@ def set_links_title_desc(results, divs):
                 descendant['href'] = current_links[-1]
                 descendant['target'] = "_blank"
                 descendant['rel'] = 'noopener noreferrer'
-                #descendant['href'] = '#'
+                
         str_divs.append(divs[i])
-        #print("Title:", current_title_and_desc[-1][0])
-        #print("Desc:", current_title_and_desc[-1][1])
         if len(current_links) >=10:
             break
     return str_divs
@@ -91,7 +89,7 @@ def test(request):
 
 
 def home(request):
-    context = {'stats_local': ['Total Stats', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']}
+    context = {'stats_local': ['Total Stats', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', rf.model, rf.feature]}
     return render(request, 'search/home.html', context=context)
 # Create your views here.
 def edit(request, annotation): #this is submitting annotations
@@ -129,7 +127,7 @@ def edit(request, annotation): #this is submitting annotations
                     labels.append(0)
                 else:
                     labels.append(1)
-            print("Predictions:", labels)
+            #print("Predictions:", labels)
             data = rf.generate_random_forest()
             data.insert(0, current_object)
             return render(request, 'search/iframe_page.html', {'links': current_links, 'labels': labels, 'stats_local': data, 'divs': str_divs})
@@ -146,9 +144,9 @@ def handle_input(request):
             for query in queries:
                 if query != "":
                     current_queries.append(query.lower())
-                    print("Query:", query)
+                    #print("Query:", query)
             global current_object
-            print(form['your_object'])
+            #print(form['your_object'])
             current_object = "" + str(form['your_object'].value()).lower()
             if len(current_queries) != 0:
                 global current_links
@@ -173,3 +171,18 @@ def download(request):
     response['Content-Type'] = 'text/plain'
     response['Content-Disposition'] = 'attachment; filename=search_dataset.csv'
     return response
+
+
+def change_model(request, model, features):
+    if model != 'ML Models':
+        rf.model = model
+    if features != 'Feature Generation Techniques':
+        rf.feature = features
+    
+    if not rf.is_empty():
+        data = rf.generate_random_forest()
+        data.insert(0, 'Total Stats')
+        return render(request, 'search/home.html', {'stats_local': data})
+    else:
+        context = {'stats_local': ['Total Stats', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', rf.model, rf.feature]}
+        return render(request, 'search/home.html', context=context)
