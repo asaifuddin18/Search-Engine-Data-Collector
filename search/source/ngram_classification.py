@@ -4,6 +4,9 @@ import pandas as pd
 import re
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC
 from urllib.parse import urlparse
 from .symmetric_dict import SymmetricDict
 from string import ascii_lowercase
@@ -149,6 +152,9 @@ class NgramClassification:
         elif self.feature == 'Term Frequency * Mutual Information':
             features = self.tf_mi_array(features)
             print('tf_mi')
+        elif self.feature == 'Term Frequency * Inverse Doc. Freq.':
+            print('tf_idf')
+            features = self.tf_mi_array(features)
         
         #tf_mi_features = self.tf_mi_array(features)
         train_features, test_features, train_labels, test_labels = train_test_split(features, self.labels, test_size = .2) #Is this too expensive?
@@ -158,6 +164,11 @@ class NgramClassification:
             rf = RandomForestClassifier()
             rf.fit(train_features, train_labels)
             inferences = rf.predict(test_features)
+        elif self.model == 'SVM':
+            print('svm')
+            svm = make_pipeline(StandardScaler(), SVC(gamma='auto'))
+            svm.fit(train_features, train_labels)
+            inferences = svm.predict(test_features)
 
         difference = test_labels - inferences #0 means either TP or TN, 1 means FN, -1 means FP
 
@@ -244,6 +255,10 @@ class NgramClassification:
             print('tf_mi')
             data_test = self.tf_mi_array(data_test)
             data_train = self.tf_mi_array(data_train)
+        elif self.feature == 'Term Frequency * Inverse Doc. Freq.':
+            print('tf_idf')
+            data_test = self.tf_idf_array(data_test)
+            data_train = self.tf_idf_array(data_train)
         #data_test_tf_mi = self.tf_mi_array(data_test)
         #data_train_tf_mi = self.tf_mi_array(data_train)
         inferences = []
@@ -252,6 +267,11 @@ class NgramClassification:
             rf = RandomForestClassifier()
             rf.fit(data_train, self.labels)
             inferences = rf.predict(data_test)
+        elif self.model == 'SVM':
+            print('svm')
+            svm = make_pipeline(StandardScaler(), SVC(gamma='auto'))
+            svm.fit(data_train, self.labels)
+            inferences = svm.predict(data_test)
         #rf = RandomForestClassifier()
 
         #rf.fit(data_train, self.labels)
@@ -311,6 +331,46 @@ class NgramClassification:
                 v2 = (c*n)/((a+c)*n2)
                 tf_mi_arr[i][j] = math.log2(max(v1, v2))*arr[i][j]
         return tf_mi_arr
+
+
+    def tf_idf_array(self, arr) -> np.array:
+        """
+        Creates tf.idf array
+        Parameters
+        ----------
+        arr: np.array
+            The numpy array given when converting the pandas term-frequency dataframe into a numpy array
+        Returns
+        -------
+        np.array:
+            A numpy array of same dimensions of the input array except with tf.mi values filled in
+        """
+        num_class = [0]*self.idx
+        for label in self.labels:
+            num_class[label] += 1
+        
+
+        freq_array = np.zeros((self.idx, 17576*3, 4)) #0th dim = class, 1st dim = tri-gram, 2nd dim = a,b,c,d
+
+        for i in range(len(arr)):
+            for j in range(len(arr[i])):
+                if arr[i][j] != 0:
+                    freq_array[self.labels[i]][j][0] += 1 #a
+                    temp = np.arange(self.idx)
+                    temp = np.delete(temp, self.labels[i])
+                    freq_array[temp,j,2] += 1 #c
+
+        tf_idf_arr = np.zeros((len(arr), len(arr[0])))
+        for i in range(len(arr)):
+            for j in range(len(arr[i])):
+                a = freq_array[self.labels[i]][j][0]
+                c = freq_array[self.labels[i]][j][2]
+                n = len(self.labels)
+                if a + c == 0:
+                    tf_idf_arr[i][j] = 0
+                    continue
+                tf_idf_arr[i][j] = math.log2(n/(a+c))*arr[i][j]
+        return tf_idf_arr
 
     def download_dataset(self) -> str:
         """

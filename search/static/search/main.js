@@ -5,11 +5,13 @@ var dict_t = {
 };
 
 var models = {
-    "rf": "Random Forest"
+    "rf": "Random Forest",
+    "svm": "SVM"
 };
 var features = {
     "tf": "Term Frequency",
-    "tf_mi": "Term Frequency * Mutual Information"
+    "tf_mi": "Term Frequency * Mutual Information",
+    "tf_idf": "Term Frequency * Inverse Doc. Freq."
 };
 //var features = ["tf", "tf_mi"];
 

@@ -22,6 +22,6 @@ The webite uses the Django framework along with Bootstrap for frontend.
 
 Implement more ML models
 
-Implement tf.idf
+~~Implement tf.idf~~
 
-Allow user to change models/features through home page
+~~Allow user to change models/features through home page~~
