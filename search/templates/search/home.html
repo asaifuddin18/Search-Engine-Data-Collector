@@ -210,6 +210,20 @@
     <div class="col-2">
       <button class="btn btn-primary" type="button" id="change_model">Change Model</button>
     </div>
+    <div class="col-4">
+      
+    </div>
+    <div class="col-1">
+      <button class="btn btn-secondary dropdown-toggle" type="button" id="graph_view" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Graph View
+      </button>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <a class="dropdown-item" id="accuracy" href="#">Accuracy</a>
+        <a class="dropdown-item" id="recall" href="#">Recall</a>
+        <a class="dropdown-item" id="precision" href="#">Precision</a>
+        <a class="dropdown-item" id="f1" href="#">F1</a>
+      </div>
+    </div>
   </div>
   <div class="row">
     <canvas class="my-4" id="myChart" width="900" height="380"></canvas>
@@ -220,75 +234,9 @@
   {{ past_precision|json_script:"past_precision" }}
   {{ past_recall|json_script:"past_recall" }}
   {{ data_x|json_script:"data_x" }}
+  {{ order|json_script:"order" }}
   {% endif %}
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
-    <script>
-      var past_accuracy = null;
-      var past_precision = null;
-      var past_f1 = null;
-      var past_recall = null;
-      var data_x = null
-      try {
-        past_accuracy = JSON.parse(document.getElementById('past_accuracy').textContent);
-        past_precision = JSON.parse(document.getElementById('past_precision').textContent);
-        past_f1 = JSON.parse(document.getElementById('past_f1').textContent);
-        past_recall = JSON.parse(document.getElementById('past_recall').textContent);
-        data_x = JSON.parse(document.getElementById('data_x').textContent);
-      } catch(error) {
-
-      }
-      var ctx = document.getElementById("myChart");
-      var myChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: data_x,
-          datasets: [{
-            data: past_recall[0],
-            lineTension: 0,
-            backgroundColor: 'transparent',
-            borderColor: '#0275d8',
-            borderWidth: 4,
-            pointBackgroundColor: '#0275d8'
-          },
-          {
-            data: past_recall[1],
-            lineTension: 0,
-            backgroundColor: 'transparent',
-            borderColor: '#5cb85c',
-            borderWidth: 4,
-            pointBackgroundColor: '#5cb85c'
-          },
-          {
-            data: past_recall[2],
-            lineTension: 0,
-            backgroundColor: 'transparent',
-            borderColor: '#5bc0de',
-            borderWidth: 4,
-            pointBackgroundColor: '#5bc0de'
-          },
-          {
-            data: past_recall[3],
-            lineTension: 0,
-            backgroundColor: 'transparent',
-            borderColor: '#f0ad4e',
-            borderWidth: 4,
-            pointBackgroundColor: '#f0ad4e'
-          }]
-        },
-        options: {
-          scales: {
-            yAxes: [{
-              ticks: {
-                beginAtZero: true
-              }
-            }]
-          },
-          legend: {
-            display: false,
-          }
-        }
-      });
-    </script>
   <!--Object and query form-->
 </div>
 <script src="{% static 'search/sidebars.js' %}"></script>

@@ -116,11 +116,11 @@ def edit(request, annotation): #this is submitting annotations
         past_precision[i].append(data[2][i])
         past_recall[i].append(data[1][i])
     data_x.append(len(past_accuracy))
-    print('recall', past_recall)
     #data.insert(0, 'Total Stats')
     #print(past_data)
     #print(data_x)
-    return render(request, 'search/home.html', {'stats_local': data, 'data_x': data_x, 'past_accuracy': past_accuracy, 'past_f1': past_f1, 'past_precision': past_precision, 'past_recall': past_recall})
+    order = list(rf.sd.keys())
+    return render(request, 'search/home.html', {'stats_local': data, 'data_x': data_x, 'past_accuracy': past_accuracy, 'past_f1': past_f1, 'past_precision': past_precision, 'past_recall': past_recall, 'order': order})
 
 def handle_input(request):
     print("triggered")

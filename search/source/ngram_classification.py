@@ -178,11 +178,10 @@ class NgramClassification:
         accuracy = sklearn.metrics.accuracy_score(test_labels, inferences)
         print("inferences", inferences)
         print("test labels", test_labels)
-        print("recall before cleaning", recall)
-        #while len(f1) < 4:
-        #    f1.append(0)
-        #    recall.append(0)
-        #    precision.append(0)
+        print("f1", f1)
+        print("recall", recall)
+        print("precision", precision)
+        print("accuracy", accuracy)
         return [accuracy, recall, precision, f1]
 
 
