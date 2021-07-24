@@ -1,5 +1,6 @@
 import numpy as np
 from numpy.lib import tracemalloc_domain
+from numpy.lib.function_base import average
 import pandas as pd
 import re
 from sklearn.model_selection import train_test_split
@@ -7,6 +8,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
+import sklearn
 from urllib.parse import urlparse
 from .symmetric_dict import SymmetricDict
 from string import ascii_lowercase
@@ -157,7 +159,7 @@ class NgramClassification:
             features = self.tf_mi_array(features)
         
         #tf_mi_features = self.tf_mi_array(features)
-        train_features, test_features, train_labels, test_labels = train_test_split(features, self.labels, test_size = .2) #Is this too expensive?
+        train_features, test_features, train_labels, test_labels = train_test_split(features, self.labels, test_size = .3) #Is this too expensive?
         inferences = []
         if self.model == 'Random Forest':
             print('rf')
@@ -170,57 +172,18 @@ class NgramClassification:
             svm.fit(train_features, train_labels)
             inferences = svm.predict(test_features)
 
-        difference = np.array(test_labels) - np.array(inferences) #0 means either TP or TN, 1 means FN, -1 means FP
-        #class_stats = {}
-        #for current in self.sd.keys()
-
-        TP = 0
-        TN = 0
-        FP = 0
-        FN = 0
-        for i in range(len(difference)):
-            if difference[i] == 1:
-                FN += 1
-            elif difference[i] == -1:
-                FP += 1
-            else:
-                if train_labels[i] == 1:
-                    TP += 1
-                else:
-                    TN += 1
-        
-        #d = {"recall": TP/(TP+FN), "specificity": TN/(TN+FP), "precision": TP/(TP+FP), "accuracy": (TP+TN)/(TP+TN+FP+FN)}
-        #d["f1"] = 2*(d["precision"] * d["recall"])/(d["precision"] + d["recall"])
-        #return d
-        accuracy = 0
-        recall = 0
-        specificity = 0
-        precision = 0
-        f1 = 0
-        if TP + TN + FP + FN == 0:
-            accuracy = 'N/A'
-        else:
-            accuracy = round((TP+TN)/(TP+TN+FP+FN), 2)
-        if TP + FN == 0:
-            recall = 'N/A'
-        else:
-            recall = round(TP/(TP+FN),2)
-        if TN + FP == 0:
-            specificity = 'N/A'
-        else:
-            specificity = round(TN/(TN+FP), 2)
-        if TP + FP == 0:
-            precision = 'N/A'
-        else:
-            precision = round(TP/(TP+FP), 2)
-        if precision == 'N/A' or recall == 'N/A' or (precision == 0 and recall == 0):
-            f1 = 'N/A'
-        else:
-            f1 = round(2*(precision * recall)/(precision + recall), 2)
-
-        #to_return = [(TP+TN)/(TP+TN+FP+FN), TP/(TP+FN), TN/(TN+FP), TP/(TP+FP)]
-        #to_return.append(2*(to_return[3] * to_return[1])/(to_return[3] + to_return[1]))
-        return [accuracy, recall, specificity, precision, f1]
+        f1 = list(sklearn.metrics.f1_score(test_labels, inferences, average=None, zero_division=0, labels=[0,1,2,3]))
+        recall = list(sklearn.metrics.recall_score(test_labels, inferences, average=None, zero_division=0, labels=[0,1,2,3]))
+        precision = list(sklearn.metrics.precision_score(test_labels, inferences, average=None, zero_division=0, labels=[0,1,2,3]))
+        accuracy = sklearn.metrics.accuracy_score(test_labels, inferences)
+        print("inferences", inferences)
+        print("test labels", test_labels)
+        print("recall before cleaning", recall)
+        #while len(f1) < 4:
+        #    f1.append(0)
+        #    recall.append(0)
+        #    precision.append(0)
+        return [accuracy, recall, precision, f1]
 
 
     def predict(self, urls, snippets, object, titles) -> list():

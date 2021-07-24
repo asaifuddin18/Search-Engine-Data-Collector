@@ -10,18 +10,17 @@ The webite uses the Django framework along with Bootstrap for frontend.
 
 
 ## TODO
-~~Add links back into Google search result Divs~~
+1. Implement more ML models
 
-~~Add search query templates~~
+1. Implement engineered features (e.g. pos of search result, length of url)
 
-~~Remove "Images" and "Related Searches"~~
+2. Add option to switch graph views
 
-~~Allow user to download dataset~~
+1. Fix sidebar
 
-~~Improve ML model by implementing tf.mi~~
+1. Add more data analytical options?
 
-Implement more ML models
+3. Collect lots of data
 
-~~Implement tf.idf~~
+3. Make tab open in the same place (maybe as a pop-up?)
 
-~~Allow user to change models/features through home page~~

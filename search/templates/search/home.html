@@ -214,18 +214,25 @@
   <div class="row">
     <canvas class="my-4" id="myChart" width="900" height="380"></canvas>
   </div>
-  {% if past_data %}
-  {{ past_data|json_script:"past_data" }}
-  {% endif %}
-  {% if data_x %}
+  {% if past_f1 %}
+  {{ past_f1|json_script:"past_f1" }}
+  {{ past_accuracy|json_script:"past_accuracy" }}
+  {{ past_precision|json_script:"past_precision" }}
+  {{ past_recall|json_script:"past_recall" }}
   {{ data_x|json_script:"data_x" }}
   {% endif %}
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
     <script>
-      var past_data = []
-      var data_x = []
+      var past_accuracy = null;
+      var past_precision = null;
+      var past_f1 = null;
+      var past_recall = null;
+      var data_x = null
       try {
-        past_data = JSON.parse(document.getElementById('past_data').textContent);
+        past_accuracy = JSON.parse(document.getElementById('past_accuracy').textContent);
+        past_precision = JSON.parse(document.getElementById('past_precision').textContent);
+        past_f1 = JSON.parse(document.getElementById('past_f1').textContent);
+        past_recall = JSON.parse(document.getElementById('past_recall').textContent);
         data_x = JSON.parse(document.getElementById('data_x').textContent);
       } catch(error) {
 
@@ -236,12 +243,36 @@
         data: {
           labels: data_x,
           datasets: [{
-            data: past_data,
+            data: past_recall[0],
             lineTension: 0,
             backgroundColor: 'transparent',
-            borderColor: '#007bff',
+            borderColor: '#0275d8',
             borderWidth: 4,
-            pointBackgroundColor: '#007bff'
+            pointBackgroundColor: '#0275d8'
+          },
+          {
+            data: past_recall[1],
+            lineTension: 0,
+            backgroundColor: 'transparent',
+            borderColor: '#5cb85c',
+            borderWidth: 4,
+            pointBackgroundColor: '#5cb85c'
+          },
+          {
+            data: past_recall[2],
+            lineTension: 0,
+            backgroundColor: 'transparent',
+            borderColor: '#5bc0de',
+            borderWidth: 4,
+            pointBackgroundColor: '#5bc0de'
+          },
+          {
+            data: past_recall[3],
+            lineTension: 0,
+            backgroundColor: 'transparent',
+            borderColor: '#f0ad4e',
+            borderWidth: 4,
+            pointBackgroundColor: '#f0ad4e'
           }]
         },
         options: {

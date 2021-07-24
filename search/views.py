@@ -16,7 +16,10 @@ current_title_and_desc = []
 current_object = ""
 past_data = []
 data_x = []
-past_data_full = []
+past_accuracy = []
+past_recall = [[],[],[],[]]
+past_precision = [[],[],[],[]]
+past_f1 = [[],[],[],[]]
 '''def prune_divs(links, divs_):
     divs = []
     links_index = 0
@@ -107,13 +110,17 @@ def edit(request, annotation): #this is submitting annotations
     for i in range(len(current_links)):
         rf.add_datapoint(current_links[i], current_title_and_desc[i][1], truths[i], current_object, current_title_and_desc[i][0])
     data = rf.generate_random_forest()
-    past_data.append(data[0])
-    data_x.append(len(past_data))
-    data.insert(0, 'Total Stats')
-    past_data_full.append(data)
-    print(past_data)
-    print(data_x)
-    return render(request, 'search/home.html', {'stats_local': data, 'past_data': past_data, 'data_x': data_x})
+    past_accuracy.append(data[0])
+    for i in range(len(data[1])):
+        past_f1[i].append(data[3][i])
+        past_precision[i].append(data[2][i])
+        past_recall[i].append(data[1][i])
+    data_x.append(len(past_accuracy))
+    print('recall', past_recall)
+    #data.insert(0, 'Total Stats')
+    #print(past_data)
+    #print(data_x)
+    return render(request, 'search/home.html', {'stats_local': data, 'data_x': data_x, 'past_accuracy': past_accuracy, 'past_f1': past_f1, 'past_precision': past_precision, 'past_recall': past_recall})
 
 def handle_input(request):
     print("triggered")
@@ -144,8 +151,8 @@ def handle_input(request):
                         labels.append(0)
                     else:
                         labels.append(1)
-            if len(past_data_full) != 0: #creates stats
-                data = past_data_full[-1]
+            if len(past_data) != 0: #creates stats
+                data = past_data[-1]
                 data.insert(0, 'Total Stats')
             return render(request, 'search/iframe_page.html', {'links': current_links, 'stats_local': data, 'divs': str_divs, 'labels': labels})
         else:
@@ -170,11 +177,15 @@ def change_model(request, model, features):
     
     if not rf.is_empty():
         data = rf.generate_random_forest()
-        past_data.append(data[0])
-        data_x.append(len(past_data))
-        past_data_full.append(data)
-        data.insert(0, 'Total Stats')
-        return render(request, 'search/home.html', {'stats_local': data, 'past_data': past_data, 'data_x': data_x})
+        past_accuracy.append(data[0])
+        for i in range(len(data[1])):
+            past_f1[i].append(data[3][i])
+            past_precision[i].append(data[2][i])
+            past_recall[i].append(data[1][i])
+        data_x.append(len(past_accuracy))
+       
+            
+        return render(request, 'search/home.html', {'stats_local': data, 'data_x': data_x, 'past_accuracy': past_accuracy, 'past_f1': past_f1, 'past_precision': past_precision, 'past_recall': past_recall})
     else:
         context = {'stats_local': ['Total Stats', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', rf.model, rf.feature]}
         return render(request, 'search/home.html', context=context)
