@@ -11,11 +11,12 @@ import bs4
 from .libraries.xgoogle.search import GoogleSearch, SearchError
 import re
 rf = NgramClassification()
-current_queries = []
 current_links = []
 current_title_and_desc = []
 current_object = ""
-
+past_data = []
+data_x = []
+past_data_full = []
 '''def prune_divs(links, divs_):
     divs = []
     links_index = 0
@@ -98,70 +99,58 @@ def edit(request, annotation): #this is submitting annotations
         if c == '0':
             truths.append("not_homepage")
         else:
-            truths.append(current_object + "_" + "homepage")
+            truths.append(current_object + "_homepage")
     
-    #do rf stuff here
+    
     global current_links
     global current_title_and_desc
     for i in range(len(current_links)):
         rf.add_datapoint(current_links[i], current_title_and_desc[i][1], truths[i], current_object, current_title_and_desc[i][0])
-    
-    if len(current_queries) != 0: #trying to annotate without any input check
-        del current_queries[0]
-        if len(current_queries) != 0:#ran out of queries
-            try:
-                gs = GoogleSearch(current_queries[0])
-                gs.results_per_page = 15
-                results, divs = gs.get_results()    
-                str_divs_ = set_links_title_desc(results, divs)
-                str_divs = [str(x) for x in str_divs_]
-                
-                #download_urls(current_links)
-            except SearchError:
-                return render(request, 'search/home.html') #probably change this to call edit() again
-            
-            predictions = rf.predict(current_links, [x[1] for x in current_title_and_desc], current_object, [x[0] for x in current_title_and_desc])
-            labels = []
-            for current in predictions:
-                if current == "not_homepage":
-                    labels.append(0)
-                else:
-                    labels.append(1)
-            #print("Predictions:", labels)
-            data = rf.generate_random_forest()
-            data.insert(0, current_object)
-            return render(request, 'search/iframe_page.html', {'links': current_links, 'labels': labels, 'stats_local': data, 'divs': str_divs})
     data = rf.generate_random_forest()
+    past_data.append(data[0])
+    data_x.append(len(past_data))
     data.insert(0, 'Total Stats')
-    return render(request, 'search/home.html', {'stats_local': data})
+    past_data_full.append(data)
+    print(past_data)
+    print(data_x)
+    return render(request, 'search/home.html', {'stats_local': data, 'past_data': past_data, 'data_x': data_x})
 
 def handle_input(request):
+    print("triggered")
     if request.method == 'POST':
+        print("POST request")
         form = QueryForm(request.POST)
         if form.is_valid():
-            
-            queries = form['your_queries'].value().split('\n')
-            for query in queries:
-                if query != "":
-                    current_queries.append(query.lower())
-                    #print("Query:", query)
+            query = str(form['q1'].value()) + " " + str(form['q2'].value()) + " " + str(form['q3'].value()) + " " + str(form['q4'].value()) + " " + str(form['q5'].value()) + " " + str(form['q6'].value())
+            query = query.strip()
             global current_object
-            #print(form['your_object'])
             current_object = "" + str(form['your_object'].value()).lower()
-            if len(current_queries) != 0:
-                global current_links
-                try:
-                    gs = GoogleSearch(current_queries[0])
-                    gs.results_per_page = 15
-                    results, divs = gs.get_results()    
-                    str_divs_ = set_links_title_desc(results, divs)
-                    str_divs = [str(x) for x in str_divs_]
-                    #download_urls(current_links)
-                except SearchError:
-                    return render(request, 'search/home.html')
-                    
+            try:
+                gs = GoogleSearch(query)
+                gs.results_per_page = 15
+                results, divs = gs.get_results()
+                str_divs_ = set_links_title_desc(results, divs)
+                str_divs = str_divs = [str(x) for x in str_divs_]
+            except SearchError:
+                return render(request, 'search/home.html')
+            
 
-                return render(request, 'search/iframe_page.html', {'links': current_links, 'stats_local': [current_object, 'N/A', 'N/A', 'N/A', 'N/A', 'N/A'], 'divs': str_divs})
+            data = [current_object, 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']
+            labels = []
+            if current_object + "_homepage" in rf.sd.keys(): #create annotations
+                predictions = rf.predict(current_links, [x[1] for x in current_title_and_desc], current_object, [x[0] for x in current_title_and_desc])
+                for current in predictions:
+                    if current == "not_homepage":
+                        labels.append(0)
+                    else:
+                        labels.append(1)
+            if len(past_data_full) != 0: #creates stats
+                data = past_data_full[-1]
+                data.insert(0, 'Total Stats')
+            return render(request, 'search/iframe_page.html', {'links': current_links, 'stats_local': data, 'divs': str_divs, 'labels': labels})
+        else:
+            print("FORM NOT VALID")
+    print(request.method)
     return render(request, 'search/home.html') #form failed
 
 
@@ -174,15 +163,18 @@ def download(request):
 
 
 def change_model(request, model, features):
-    if model != 'ML Models':
+    if 'ML Models' not in model:
         rf.model = model
-    if features != 'Feature Generation Techniques':
+    if 'Feature Generation Techniques' not in features:
         rf.feature = features
     
     if not rf.is_empty():
         data = rf.generate_random_forest()
+        past_data.append(data[0])
+        data_x.append(len(past_data))
+        past_data_full.append(data)
         data.insert(0, 'Total Stats')
-        return render(request, 'search/home.html', {'stats_local': data})
+        return render(request, 'search/home.html', {'stats_local': data, 'past_data': past_data, 'data_x': data_x})
     else:
         context = {'stats_local': ['Total Stats', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', rf.model, rf.feature]}
         return render(request, 'search/home.html', context=context)

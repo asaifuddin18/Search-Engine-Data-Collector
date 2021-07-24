@@ -1,7 +1,7 @@
 var dict_t = {
-    "Professor": "FirstName LastName Institution\ne.g. Jian Peng UIUC",
-    "Movie": "Name Year\ne.g. Avatar 2009",
-    "Electronic": "Model Year/Model\ne.g. iPhone 12"
+    "Professor": ["First Name", "Last Name", "Institution"],
+    "Movie": ["Name", "Year"],
+    "Electronic": ["Name", "Model No./Year"]
 };
 
 var models = {
@@ -13,16 +13,29 @@ var features = {
     "tf_mi": "Term Frequency * Mutual Information",
     "tf_idf": "Term Frequency * Inverse Doc. Freq."
 };
+var qs = ["q1", "q2", "q3", "q4", "q5", "q6"];
 //var features = ["tf", "tf_mi"];
 
 window.onload = function() {
     for (var key in dict_t) {
         document.getElementById(key).addEventListener("click", function(event) {
-            var queryBox = document.getElementById("your_queries");
-            queryBox.placeholder = "Enter queries following the template: " + dict_t[event.target.id];
+            //var queryBox = document.getElementById("your_queries");
+            //queryBox.placeholder = "Enter queries following the template: " + dict_t[event.target.id];
             document.getElementById("dropdownMenuButton").textContent = event.target.id;
             var your_object = document.getElementById("your_object");
             your_object.value = event.target.id;
+            for (var i = 0; i < qs.length; i++) {
+                var curQ = document.getElementById(qs[i]);
+                curQ.style.visibility = "hidden";
+                curQ.required = false;
+            }
+            
+            for (var i = 0; i < dict_t[event.target.id].length; i++) {
+                var curQ = document.getElementById(qs[i]);
+                curQ.style.visibility = "visible";
+                curQ.placeholder = dict_t[event.target.id][i];
+                curQ.required = true;
+            }
         })
     }
 

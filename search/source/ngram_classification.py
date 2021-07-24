@@ -170,7 +170,9 @@ class NgramClassification:
             svm.fit(train_features, train_labels)
             inferences = svm.predict(test_features)
 
-        difference = test_labels - inferences #0 means either TP or TN, 1 means FN, -1 means FP
+        difference = np.array(test_labels) - np.array(inferences) #0 means either TP or TN, 1 means FN, -1 means FP
+        #class_stats = {}
+        #for current in self.sd.keys()
 
         TP = 0
         TN = 0
