@@ -10,7 +10,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 import sklearn
 from urllib.parse import urlparse
-from .symmetric_dict import SymmetricDict
 from string import ascii_lowercase
 import math
 
@@ -41,8 +40,7 @@ class NgramClassification:
     def __init__(self) -> None:
         self.features = []
         self.labels = []
-        self.sd = SymmetricDict()
-        self.sd[0] = "not_homepage"
+        self.classes = ['not_homepage']
         self.idx = 1
         self.model = "Random Forest"
         self.feature = "Term Frequency * Mutual Information"
@@ -132,10 +130,10 @@ class NgramClassification:
         """
         
         self.df.loc[len(self.df.index)] = self.__construct_features(url, description, object, title)
-        if label not in self.sd:
-            self.sd[label] = self.idx
+        if label not in self.classes:
+            self.classes.append(label)
             self.idx += 1
-        self.labels.append(self.sd[label])
+        self.labels.append(self.classes.index(label))
 
     def generate_random_forest(self) -> dict:
         """
@@ -242,9 +240,9 @@ class NgramClassification:
         #predictions = rf.predict(data_test)
         pred_string = []
         for num in inferences:
-            if num not in self.sd:
+            if num >= len(self.classes):
                 raise ValueError("Object not in symmetric dictionary on prediction")
-            pred_string.append(self.sd[num])
+            pred_string.append(self.classes[num])
         return pred_string
 
     def tf_mi_array(self, arr) -> np.array:

@@ -119,8 +119,7 @@ def edit(request, annotation): #this is submitting annotations
     #data.insert(0, 'Total Stats')
     #print(past_data)
     #print(data_x)
-    order = list(rf.sd.keys())
-    return render(request, 'search/home.html', {'stats_local': data, 'data_x': data_x, 'past_accuracy': past_accuracy, 'past_f1': past_f1, 'past_precision': past_precision, 'past_recall': past_recall, 'order': order})
+    return render(request, 'search/home.html', {'stats_local': data, 'data_x': data_x, 'past_accuracy': past_accuracy, 'past_f1': past_f1, 'past_precision': past_precision, 'past_recall': past_recall, 'order': rf.classes})
 
 def handle_input(request):
     print("triggered")
@@ -144,7 +143,7 @@ def handle_input(request):
 
             data = [current_object, 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']
             labels = []
-            if current_object + "_homepage" in rf.sd.keys(): #create annotations
+            if current_object + "_homepage" in rf.classes: #create annotations
                 predictions = rf.predict(current_links, [x[1] for x in current_title_and_desc], current_object, [x[0] for x in current_title_and_desc])
                 for current in predictions:
                     if current == "not_homepage":
@@ -185,7 +184,7 @@ def change_model(request, model, features):
         data_x.append(len(past_accuracy))
        
             
-        return render(request, 'search/home.html', {'stats_local': data, 'data_x': data_x, 'past_accuracy': past_accuracy, 'past_f1': past_f1, 'past_precision': past_precision, 'past_recall': past_recall})
+        return render(request, 'search/home.html', {'stats_local': data, 'data_x': data_x, 'past_accuracy': past_accuracy, 'past_f1': past_f1, 'past_precision': past_precision, 'past_recall': past_recall, 'order': rf.classes})
     else:
         context = {'stats_local': ['Total Stats', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', rf.model, rf.feature]}
         return render(request, 'search/home.html', context=context)

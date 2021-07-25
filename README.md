@@ -14,7 +14,7 @@ The webite uses the Django framework along with Bootstrap for frontend.
 
 1. Implement engineered features (e.g. pos of search result, length of url)
 
-2. Add option to switch graph views
+2. ~~Add option to switch graph views~~
 
 1. Fix sidebar
 

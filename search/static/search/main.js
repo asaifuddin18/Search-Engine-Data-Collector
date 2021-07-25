@@ -65,24 +65,41 @@ window.onload = function() {
                     
                     if (i == 0) {
                         dataset.data = past_accuracy;
+                        dataset.label = "accuracy";
                     } else {
                         dataset.data = [];
+                        dataset.label = "";
                     }
                     i++;
                 });
             } else if (event.target.id == "precision") {
                 myChart.data.datasets.forEach((dataset) => {
                     dataset.data = past_precision[i];
+                    if (i < order.length) {
+                        dataset.label = order[i];
+                    } else {
+                        dataset.label = "";
+                    }
                     i++;
                 });
             } else if (event.target.id == "f1") {
                 myChart.data.datasets.forEach((dataset) => {
                     dataset.data = past_f1[i];
+                    if (i < order.length) {
+                        dataset.label = order[i];
+                    } else {
+                        dataset.label = "";
+                    }
                     i++;
                 });
             } else if (event.target.id == "recall") {
                 myChart.data.datasets.forEach((dataset) => {
                     dataset.data = past_recall[i];
+                    if (i < order.length) {
+                        dataset.label = order[i];
+                    } else {
+                        dataset.label = "";
+                    }
                     i++;
                 });
             }
@@ -119,7 +136,7 @@ var myChart = new Chart(ctx, {
             borderColor: '#0275d8',
             borderWidth: 4,
             pointBackgroundColor: '#0275d8',
-            label: order[0]
+            label: "accuracy"
           },
           {
             data: [],
@@ -128,7 +145,7 @@ var myChart = new Chart(ctx, {
             borderColor: '#5cb85c',
             borderWidth: 4,
             pointBackgroundColor: '#5cb85c',
-            label: order[1]
+            label: ""
           },
           {
             data: [],
@@ -137,7 +154,7 @@ var myChart = new Chart(ctx, {
             borderColor: '#5bc0de',
             borderWidth: 4,
             pointBackgroundColor: '#5bc0de',
-            label: order[2]
+            label: ""
           },
           {
             data: [],
@@ -146,7 +163,7 @@ var myChart = new Chart(ctx, {
             borderColor: '#f0ad4e',
             borderWidth: 4,
             pointBackgroundColor: '#f0ad4e',
-            label: order[3]
+            label: ""
           }]
         },
         options: {
