@@ -20,6 +20,7 @@ var past_f1 = null;
 var past_recall = null;
 var data_x = null;
 var order = null;
+var class_count = JSON.parse(document.getElementById('class_count').textContent);
 try {
     past_accuracy = JSON.parse(document.getElementById('past_accuracy').textContent);
     past_precision = JSON.parse(document.getElementById('past_precision').textContent);
@@ -181,3 +182,27 @@ var myChart = new Chart(ctx, {
         }
     }
 });
+//pie
+var pieData = {
+    labels: order,
+    datasets: [
+      {
+        data: class_count,
+        backgroundColor: [
+           "#0275d8", 
+           "#5cb85c", 
+           "#5bc0de", 
+           "#f0ad4e"
+        ]
+    }]
+  };
+  
+  var ctx = document.getElementById("myData").getContext("2d");
+  var pie_chart = document.getElementById("myData");
+  if (class_count[0] == 0) {
+      pieData.style.visibility = 'hidden';
+  }
+  var myPieChart = new Chart(ctx, {
+    type: 'pie',
+    data: pieData
+  });

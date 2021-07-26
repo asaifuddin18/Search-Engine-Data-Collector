@@ -41,9 +41,12 @@ class NgramClassification:
         self.features = []
         self.labels = []
         self.classes = ['not_homepage']
-        self.idx = 1
+        self.idx = 1 #remove in future (same as len(self.classes))
         self.model = "Random Forest"
         self.feature = "Term Frequency * Mutual Information"
+        self.engineer_features = ['url_length', 'n_result', 'slash_count']
+        for f in self.engineer_features:
+            self.features.append(f)
         for c1 in ascii_lowercase:
             for c2 in ascii_lowercase:
                 for c3 in ascii_lowercase:
@@ -79,7 +82,7 @@ class NgramClassification:
         
         return tri_grams
     
-    def __construct_features(self, url, description, object, title) -> list():
+    def __construct_features(self, url, description, object, title, n) -> list():
         """
         Helper function that constructs the features required for the Random Forest
         Parameters
@@ -95,8 +98,11 @@ class NgramClassification:
         list
             A list of features generated from the URL and the snippet
         """
-        features = np.zeros((17576*3,))
+        features = np.zeros((len(self.features),))
         formatted_url = "" + url
+        cleaned = formatted_url.replace("http://www.","")
+        cleaned = formatted_url.replace("https://www.","")
+        slash_count = cleaned.count("/")
         formatted_url = re.sub(r'[^a-zA-Z]', '', formatted_url)
         formatted_url = formatted_url.lower()
 
@@ -111,11 +117,14 @@ class NgramClassification:
         tri_grams = self.__generate_trigrams(formatted_url, formatted_desc, formatted_title)
         for tri_gram in tri_grams:
             features[self.features.index(tri_gram)] += 1
+        features[0] = len(formatted_url)
+        features[1] = n
+        features[2] = slash_count
 
 
         return features
 
-    def add_datapoint(self, url, description, label, object, title) -> None:
+    def add_datapoint(self, url, description, label, object, title, n) -> None:
         """
         Parameters
         ----------
@@ -129,7 +138,7 @@ class NgramClassification:
             The name of the object
         """
         
-        self.df.loc[len(self.df.index)] = self.__construct_features(url, description, object, title)
+        self.df.loc[len(self.df.index)] = self.__construct_features(url, description, object, title, n)
         if label not in self.classes:
             self.classes.append(label)
             self.idx += 1
@@ -207,7 +216,7 @@ class NgramClassification:
         #data_test = np.array((len(urls), len(self.features)))
         data_test = []
         for i in range(len(urls)):
-            data_test.append(self.__construct_features(urls[i], snippets[i], object, titles[i]))
+            data_test.append(self.__construct_features(urls[i], snippets[i], object, titles[i], i))
         data_test = np.array(data_test)
         data_train = np.array(self.df)
         if self.feature == 'Term Frequency':
@@ -262,10 +271,10 @@ class NgramClassification:
             num_class[label] += 1
         
 
-        freq_array = np.zeros((self.idx, 17576*3, 4)) #0th dim = class, 1st dim = tri-gram, 2nd dim = a,b,c,d
+        freq_array = np.zeros((self.idx, len(self.features), 4)) #0th dim = class, 1st dim = tri-gram, 2nd dim = a,b,c,d
 
         for i in range(len(arr)):
-            for j in range(len(arr[i])):
+            for j in range(len(self.engineer_features), len(arr[i])):
                 if arr[i][j] != 0:
                     freq_array[self.labels[i]][j][0] += 1 #a
                     temp = np.arange(self.idx)
@@ -281,6 +290,9 @@ class NgramClassification:
         tf_mi_arr = np.zeros((len(arr), len(arr[0])))
         for i in range(len(arr)):
             for j in range(len(arr[i])):
+                if j < len(self.engineer_features):
+                    tf_mi_arr[i][j] = arr[i][j]
+                    continue
                 a = freq_array[self.labels[i]][j][0]
                 c = freq_array[self.labels[i]][j][2]
                 n1 = self.labels.count(self.labels[i])
@@ -308,14 +320,14 @@ class NgramClassification:
             A numpy array of same dimensions of the input array except with tf.mi values filled in
         """
         num_class = [0]*self.idx
-        for label in self.labels:
+        for label in self.labels: #raw number of datapoints per class
             num_class[label] += 1
         
 
-        freq_array = np.zeros((self.idx, 17576*3, 4)) #0th dim = class, 1st dim = tri-gram, 2nd dim = a,b,c,d
+        freq_array = np.zeros((self.idx, len(self.features), 4)) #0th dim = class, 1st dim = tri-gram, 2nd dim = a,b,c,d
 
-        for i in range(len(arr)):
-            for j in range(len(arr[i])):
+        for i in range(len(arr)): #datapoint
+            for j in range(len(self.engineer_features), len(arr[i])): #features
                 if arr[i][j] != 0:
                     freq_array[self.labels[i]][j][0] += 1 #a
                     temp = np.arange(self.idx)
@@ -325,6 +337,10 @@ class NgramClassification:
         tf_idf_arr = np.zeros((len(arr), len(arr[0])))
         for i in range(len(arr)):
             for j in range(len(arr[i])):
+                if j < len(self.engineer_features):
+                    tf_idf_arr[i][j] = arr[i][j]
+                    continue
+                
                 a = freq_array[self.labels[i]][j][0]
                 c = freq_array[self.labels[i]][j][2]
                 n = len(self.labels)
@@ -355,6 +371,12 @@ class NgramClassification:
             True if there is no data, false otherwise
         """
         return len(self.labels) == 0
+
+    def get_class_count(self):
+        num_class = [0]*4
+        for label in self.labels:
+            num_class[label] += 1
+        return num_class
 
                 
 

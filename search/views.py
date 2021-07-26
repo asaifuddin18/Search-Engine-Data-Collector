@@ -93,7 +93,7 @@ def test(request):
 
 
 def home(request):
-    context = {'stats_local': ['Total Stats', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', rf.model, rf.feature]}
+    context = {'model': rf.model, 'feature': rf.feature, 'num_datapoints': len(rf.labels), 'class_count': rf.get_class_count()}
     return render(request, 'search/home.html', context=context)
 # Create your views here.
 def edit(request, annotation): #this is submitting annotations
@@ -108,7 +108,7 @@ def edit(request, annotation): #this is submitting annotations
     global current_links
     global current_title_and_desc
     for i in range(len(current_links)):
-        rf.add_datapoint(current_links[i], current_title_and_desc[i][1], truths[i], current_object, current_title_and_desc[i][0])
+        rf.add_datapoint(current_links[i], current_title_and_desc[i][1], truths[i], current_object, current_title_and_desc[i][0], i)
     data = rf.generate_random_forest()
     past_accuracy.append(data[0])
     for i in range(len(data[1])):
@@ -116,10 +116,9 @@ def edit(request, annotation): #this is submitting annotations
         past_precision[i].append(data[2][i])
         past_recall[i].append(data[1][i])
     data_x.append(len(past_accuracy))
-    #data.insert(0, 'Total Stats')
-    #print(past_data)
-    #print(data_x)
-    return render(request, 'search/home.html', {'stats_local': data, 'data_x': data_x, 'past_accuracy': past_accuracy, 'past_f1': past_f1, 'past_precision': past_precision, 'past_recall': past_recall, 'order': rf.classes})
+    return render(request, 'search/home.html', {'stats_local': data, 'data_x': data_x, 
+    'past_accuracy': past_accuracy, 'past_f1': past_f1, 'past_precision': past_precision, 
+    'past_recall': past_recall, 'order': rf.classes, 'model': rf.model, 'feature': rf.feature, 'num_datapoints': len(rf.labels), 'class_count': rf.get_class_count()})
 
 def handle_input(request):
     print("triggered")
@@ -153,7 +152,8 @@ def handle_input(request):
             if len(past_data) != 0: #creates stats
                 data = past_data[-1]
                 data.insert(0, 'Total Stats')
-            return render(request, 'search/iframe_page.html', {'links': current_links, 'stats_local': data, 'divs': str_divs, 'labels': labels})
+            return render(request, 'search/iframe_page.html', {'links': current_links, 
+            'stats_local': data, 'divs': str_divs, 'labels': labels, 'model': rf.model, 'feature': rf.feature})
         else:
             print("FORM NOT VALID")
     print(request.method)
@@ -184,7 +184,8 @@ def change_model(request, model, features):
         data_x.append(len(past_accuracy))
        
             
-        return render(request, 'search/home.html', {'stats_local': data, 'data_x': data_x, 'past_accuracy': past_accuracy, 'past_f1': past_f1, 'past_precision': past_precision, 'past_recall': past_recall, 'order': rf.classes})
-    else:
-        context = {'stats_local': ['Total Stats', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', rf.model, rf.feature]}
-        return render(request, 'search/home.html', context=context)
+    return render(request, 'search/home.html', {'data_x': data_x,
+         'past_accuracy': past_accuracy, 'past_f1': past_f1, 'past_precision': past_precision,
+          'past_recall': past_recall, 'order': rf.classes, 'num_datapoints': len(rf.labels), 'model': rf.model, 'feature': rf.feature,
+          'class_count': rf.get_class_count()})
+    

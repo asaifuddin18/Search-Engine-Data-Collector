@@ -78,53 +78,24 @@
       <li class="nav-item">
         <a href="#" class="nav-link text-white" aria-current="page">
           <svg class="bi me-2" width="16" height="16"><use xlink:href="#home"/></svg>
-          {{stats_local.0}}
+          ML Model: {{model}}
         </a>
       </li>
       <li>
         <a href="#" class="nav-link text-white">
           <svg class="bi me-2" width="16" height="16"><use xlink:href="#speedometer2"/></svg>
-          Accuracy {{stats_local.1}}
+          Features: {{feature}}
         </a>
       </li>
       <li>
         <a href="#" class="nav-link text-white">
           <svg class="bi me-2" width="16" height="16"><use xlink:href="#table"/></svg>
-          Recall: {{stats_local.2}}
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-link text-white">
-          <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"/></svg>
-          Specificity: {{stats_local.3}}
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-link text-white">
-          <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
-          Precision: {{stats_local.4}}
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-link text-white">
-          <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
-          F1 Score: {{stats_local.5}}
+          Num Datapoints: {{num_datapoints}}
         </a>
       </li>
       <hr>
-      <li>
-        <a href="#" class="nav-link text-white">
-          <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
-          ML Model: {{stats_local.6}}
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-link text-white">
-          <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
-          Features: {{stats_local.7}}
-        </a>
-      </li>
     </ul>
+    <canvas id="myData" width="300" height="300"></canvas>
     <hr>
   </div>
 
@@ -228,6 +199,7 @@
   <div class="row">
     <canvas class="my-4" id="myChart" width="900" height="380"></canvas>
   </div>
+  {{ class_count|json_script:"class_count" }}
   {% if past_f1 %}
   {{ past_f1|json_script:"past_f1" }}
   {{ past_accuracy|json_script:"past_accuracy" }}

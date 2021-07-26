@@ -10,13 +10,18 @@ The webite uses the Django framework along with Bootstrap for frontend.
 
 
 ## TODO
-1. Implement more ML models
 
-1. Implement engineered features (e.g. pos of search result, length of url)
+1. Add cars as template (Make, model, year)
+
+1. Implement more ML models (ME)
+
+1. When switching models/features, add the new model to the x-labels (also add x,y axis labels)
+
+1. Implement engineered features
 
 2. ~~Add option to switch graph views~~
 
-1. Fix sidebar
+1. ~~Fix sidebar (add pie-chart to side)~~
 
 1. Add more data analytical options?
 
