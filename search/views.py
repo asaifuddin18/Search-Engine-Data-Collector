@@ -17,9 +17,10 @@ current_object = ""
 past_data = []
 data_x = []
 past_accuracy = []
-past_recall = [[],[],[],[]]
-past_precision = [[],[],[],[]]
-past_f1 = [[],[],[],[]]
+past_recall = [[],[],[],[],[]]
+past_precision = [[],[],[],[],[]]
+past_f1 = [[],[],[],[],[]]
+query = ""
 '''def prune_divs(links, divs_):
     divs = []
     links_index = 0
@@ -108,10 +109,10 @@ def edit(request, annotation): #this is submitting annotations
     global current_links
     global current_title_and_desc
     for i in range(len(current_links)):
-        rf.add_datapoint(current_links[i], current_title_and_desc[i][1], truths[i], current_object, current_title_and_desc[i][0], i)
+        rf.add_datapoint(current_links[i], current_title_and_desc[i][1], truths[i], current_object, current_title_and_desc[i][0], i, query)
     data = rf.generate_random_forest()
     past_accuracy.append(data[0])
-    for i in range(len(data[1])):
+    for i in range(len(data[1])): #iterate through each class
         past_f1[i].append(data[3][i])
         past_precision[i].append(data[2][i])
         past_recall[i].append(data[1][i])
@@ -126,6 +127,7 @@ def handle_input(request):
         print("POST request")
         form = QueryForm(request.POST)
         if form.is_valid():
+            global query
             query = str(form['q1'].value()) + " " + str(form['q2'].value()) + " " + str(form['q3'].value()) + " " + str(form['q4'].value()) + " " + str(form['q5'].value()) + " " + str(form['q6'].value())
             query = query.strip()
             global current_object

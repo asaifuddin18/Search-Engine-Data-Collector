@@ -279,14 +279,14 @@ class GoogleSearch(object):
         def entity_replacer(m):
             entity = m.group(1)
             if entity in name2codepoint:
-                return unichr(name2codepoint[entity])
+                return chr(name2codepoint[entity])
             else:
                 return m.group(0)
 
         def ascii_replacer(m):
             cp = int(m.group(1))
             if cp <= 255:
-                return unichr(cp)
+                return chr(cp)
             else:
                 return m.group(0)
 

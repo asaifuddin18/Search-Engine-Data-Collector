@@ -10,6 +10,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 import sklearn
 from urllib.parse import urlparse
+import urllib, sys, bs4
 from string import ascii_lowercase
 import math
 
@@ -43,16 +44,16 @@ class NgramClassification:
         self.classes = ['not_homepage']
         self.idx = 1 #remove in future (same as len(self.classes))
         self.model = "Random Forest"
-        self.feature = "Term Frequency * Mutual Information"
-        self.engineer_features = ['url_length', 'n_result', 'slash_count']
+        self.feature = "Term Frequency"
+        self.engineer_features = ['url_length', 'n_result', 'slash_count', 'dot_count', '.edu', '.com', '.gov', '.net', '.org', '.other', 'alexa_rank', 'keyword_in_netloc', 'keyword_in_path', 'keyword_in_title', 'keyword_in_description']
         for f in self.engineer_features:
             self.features.append(f)
-        for c1 in ascii_lowercase:
-            for c2 in ascii_lowercase:
-                for c3 in ascii_lowercase:
-                    self.features.append(c1+c2+c3+'_u')
-                    self.features.append(c1+c2+c3+'_d')
-                    self.features.append(c1+c2+c3+'_t')
+        #for c1 in ascii_lowercase:
+        #    for c2 in ascii_lowercase:
+        #        for c3 in ascii_lowercase:
+        #            self.features.append(c1+c2+c3+'_u')
+        #            self.features.append(c1+c2+c3+'_d')
+        #            self.features.append(c1+c2+c3+'_t')
 
         self.df = pd.DataFrame(columns=self.features)
         pass
@@ -82,7 +83,7 @@ class NgramClassification:
         
         return tri_grams
     
-    def __construct_features(self, url, description, object, title, n) -> list():
+    def __construct_features(self, url, description, object, title, n, query) -> list():
         """
         Helper function that constructs the features required for the Random Forest
         Parameters
@@ -103,6 +104,7 @@ class NgramClassification:
         cleaned = formatted_url.replace("http://www.","")
         cleaned = formatted_url.replace("https://www.","")
         slash_count = cleaned.count("/")
+        dot_count = cleaned.count('.')
         formatted_url = re.sub(r'[^a-zA-Z]', '', formatted_url)
         formatted_url = formatted_url.lower()
 
@@ -114,17 +116,43 @@ class NgramClassification:
         formatted_desc = re.sub(r'[^a-zA-Z]', '', formatted_desc)
         formatted_desc = formatted_desc.lower()
 
-        tri_grams = self.__generate_trigrams(formatted_url, formatted_desc, formatted_title)
-        for tri_gram in tri_grams:
-            features[self.features.index(tri_gram)] += 1
+        #tri_grams = self.__generate_trigrams(formatted_url, formatted_desc, formatted_title)
+        #for tri_gram in tri_grams:
+        #    features[self.features.index(tri_gram)] += 1
+        
+        domain = str(urlparse(url).netloc)
+        path = str(urlparse(url).path)
+        query_words = query.split()
+        for word in query_words:
+            word_l = word.lower()
+            if word_l in domain:
+                features[self.features.index("keyword_in_netloc")] += 1
+            if word_l in path:
+                features[self.features.index("keyword_in_path")] += 1
+            if word_l in formatted_title:
+                features[self.features.index("keyword_in_title")] += 1
+            if word_l in formatted_desc:
+                features[self.features.index("keyword_in_description")] += 1
+        
+        tld = urlparse(url).netloc.split('.')[-1]
         features[0] = len(formatted_url)
         features[1] = n
         features[2] = slash_count
+        features[3] = dot_count
+        try:
+            features[self.features.index('alexa_rank')] = int(bs4.BeautifulSoup(urllib.request.urlopen("http://data.alexa.com/data?cli=10&dat=s&url="+ str(url)).read(), "xml").find("REACH")['RANK'])
+        except: #not in alexa rankings 
+            features[self.features.index('alexa_rank')] = sys.maxsize
+        print(features[self.features.index('alexa_rank')], "alexa rank")
+        if "."+tld in self.features:
+            features[self.features.index("."+tld)] = 1
+        else:
+            features[self.features.index(".other")] = 1
 
 
         return features
 
-    def add_datapoint(self, url, description, label, object, title, n) -> None:
+    def add_datapoint(self, url, description, label, object, title, n, query) -> None:
         """
         Parameters
         ----------
@@ -138,7 +166,7 @@ class NgramClassification:
             The name of the object
         """
         
-        self.df.loc[len(self.df.index)] = self.__construct_features(url, description, object, title, n)
+        self.df.loc[len(self.df.index)] = self.__construct_features(url, description, object, title, n, query)
         if label not in self.classes:
             self.classes.append(label)
             self.idx += 1
@@ -179,9 +207,9 @@ class NgramClassification:
             svm.fit(train_features, train_labels)
             inferences = svm.predict(test_features)
 
-        f1 = list(sklearn.metrics.f1_score(test_labels, inferences, average=None, zero_division=0, labels=[0,1,2,3]))
-        recall = list(sklearn.metrics.recall_score(test_labels, inferences, average=None, zero_division=0, labels=[0,1,2,3]))
-        precision = list(sklearn.metrics.precision_score(test_labels, inferences, average=None, zero_division=0, labels=[0,1,2,3]))
+        f1 = list(sklearn.metrics.f1_score(test_labels, inferences, average=None, zero_division=0, labels=[0,1,2,3,4]))
+        recall = list(sklearn.metrics.recall_score(test_labels, inferences, average=None, zero_division=0, labels=[0,1,2,3,4]))
+        precision = list(sklearn.metrics.precision_score(test_labels, inferences, average=None, zero_division=0, labels=[0,1,2,3,4]))
         accuracy = sklearn.metrics.accuracy_score(test_labels, inferences)
         print("inferences", inferences)
         print("test labels", test_labels)
@@ -192,7 +220,7 @@ class NgramClassification:
         return [accuracy, recall, precision, f1]
 
 
-    def predict(self, urls, snippets, object, titles) -> list():
+    def predict(self, urls, snippets, object, titles, query) -> list():
         """
         Creates predictions based on input URLs
         Parameters
@@ -216,7 +244,7 @@ class NgramClassification:
         #data_test = np.array((len(urls), len(self.features)))
         data_test = []
         for i in range(len(urls)):
-            data_test.append(self.__construct_features(urls[i], snippets[i], object, titles[i], i))
+            data_test.append(self.__construct_features(urls[i], snippets[i], object, titles[i], i, query))
         data_test = np.array(data_test)
         data_train = np.array(self.df)
         if self.feature == 'Term Frequency':
@@ -373,7 +401,7 @@ class NgramClassification:
         return len(self.labels) == 0
 
     def get_class_count(self):
-        num_class = [0]*4
+        num_class = [0]*5
         for label in self.labels:
             num_class[label] += 1
         return num_class

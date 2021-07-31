@@ -8,10 +8,16 @@ A **source page** is defined to be a website that holds specific information abo
 The webite uses the Django framework along with Bootstrap for frontend.
 
 
+### Potential Features
+Physical location (may require downloading website)
+extension (would require having the most common as its own feature and a 'other' category)
+
+
+
 
 ## TODO
 
-1. Add cars as template (Make, model, year)
+1. ~~Add cars as template (Make, model, year)~~
 
 1. Implement more ML models (ME)
 
@@ -28,4 +34,8 @@ The webite uses the Django framework along with Bootstrap for frontend.
 3. Collect lots of data
 
 3. Make tab open in the same place (maybe as a pop-up?)
+
+1. ~~Use alexa rank https://data.alexa.com/data?cli=10&url=~~
+
+1. Add WHOIS data to features
 

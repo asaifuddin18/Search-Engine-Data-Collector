@@ -1,7 +1,8 @@
 var dict_t = {
     "Professor": ["First Name", "Last Name", "Institution"],
     "Movie": ["Name", "Year"],
-    "Electronic": ["Name", "Model No./Year"]
+    "Electronic": ["Name", "Model No./Year"],
+    "Car": ["Make", "Model", "Year"]
 };
 
 var models = {
@@ -73,6 +74,7 @@ window.onload = function() {
                     }
                     i++;
                 });
+                myChart.options.scales.yAxes[0].scaleLabel.labelString = "Accuracy";
             } else if (event.target.id == "precision") {
                 myChart.data.datasets.forEach((dataset) => {
                     dataset.data = past_precision[i];
@@ -83,6 +85,7 @@ window.onload = function() {
                     }
                     i++;
                 });
+                myChart.options.scales.yAxes[0].scaleLabel.labelString = "Precision";
             } else if (event.target.id == "f1") {
                 myChart.data.datasets.forEach((dataset) => {
                     dataset.data = past_f1[i];
@@ -93,6 +96,7 @@ window.onload = function() {
                     }
                     i++;
                 });
+                myChart.options.scales.yAxes[0].scaleLabel.labelString = "F1 Score";
             } else if (event.target.id == "recall") {
                 myChart.data.datasets.forEach((dataset) => {
                     dataset.data = past_recall[i];
@@ -103,6 +107,7 @@ window.onload = function() {
                     }
                     i++;
                 });
+                myChart.options.scales.yAxes[0].scaleLabel.labelString = "Recall";
             }
             myChart.update();
         })
@@ -165,14 +170,35 @@ var myChart = new Chart(ctx, {
             borderWidth: 4,
             pointBackgroundColor: '#f0ad4e',
             label: ""
+          },
+          {
+            data: [],
+            lineTension: 0,
+            backgroundColor: 'transparent',
+            borderColor: '#d9534f',
+            borderWidth: 4,
+            pointBackgroundColor: '#d9534f',
+            label: ""
           }]
         },
         options: {
           scales: {
+            xAxes: [{
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Number of Annotations',
+                    fontSize: 20
+                }
+            }],
             yAxes: [{
               ticks: {
                 beginAtZero: true,
                 max: 1
+              },
+              scaleLabel: {
+                  display: true,
+                  labelString: 'Accuracy',
+                  fontSize: 20
               }
             }]
           },
@@ -192,7 +218,8 @@ var pieData = {
            "#0275d8", 
            "#5cb85c", 
            "#5bc0de", 
-           "#f0ad4e"
+           "#f0ad4e",
+           "#d9534f"
         ]
     }]
   };
