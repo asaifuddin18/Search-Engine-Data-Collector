@@ -50,8 +50,8 @@ dict_t = {
 def clean_title_and_desc(title, desc):
     title_ = title.lower().strip()
     desc_ = desc.lower().strip()
-    title_ = re.sub(r'[^a-zA-Z0-9]', '', title_) #this removes spaces, may need to be changed in the future if using a different feature method
-    desc_ = re.sub(r'[^a-zA-Z0-9]', '', desc_)
+    title_ = re.sub(r'[^a-zA-Z0-9 ]', '', title_) #this removes spaces, may need to be changed in the future if using a different feature method
+    desc_ = re.sub(r'[^a-zA-Z0-9 ]', '', desc_)
     return title_, desc_
 
 def set_links_title_desc(results, divs):
@@ -101,16 +101,16 @@ def test(request):
 
 
 def home(request):
-    context = {'model': rf.model, 'feature': rf.feature, 'num_datapoints': len(rf.labels), 'class_count': rf.get_class_count()}
+    context = {'model': rf.model, 'num_datapoints': len(rf.labels), 'class_count': rf.get_class_count()}
     return render(request, 'search/home.html', context=context)
 # Create your views here.
 def edit(request, annotation): #this is submitting annotations
-    truths = []
-    for c in annotation:
-        if c == '0':
-            truths.append("not_homepage")
-        else:
-            truths.append(current_object + "_homepage")
+    truths = [int(c) for c in annotation]
+    #for c in annotation:
+    #    if c == '0':
+    #        truths.append("not_homepage")
+    #    else:
+    #        truths.append(current_object + "_homepage")
     
     
     global current_links
@@ -130,7 +130,7 @@ def edit(request, annotation): #this is submitting annotations
         return handle_query(request)
     return render(request, 'search/home.html', {'stats_local': data, 'data_x': data_x, 
     'past_accuracy': past_accuracy, 'past_f1': past_f1, 'past_precision': past_precision, 
-    'past_recall': past_recall, 'order': rf.classes, 'model': rf.model, 'feature': rf.feature, 'num_datapoints': len(rf.labels), 'class_count': rf.get_class_count(), 'object': current_object})
+    'past_recall': past_recall, 'order': rf.classes, 'model': rf.model, 'num_datapoints': len(rf.labels), 'class_count': rf.get_class_count(), 'object': current_object})
 
 def handle_input(request):
     print("triggered")
@@ -205,16 +205,10 @@ def handle_query(request):
         return render(request, 'search/home.html', context={'error': 'Error while using Google search engine with query: ' + query})
             
     labels = []
-    if current_object + "_homepage" in rf.classes: #create annotations
-        predictions = rf.predict(current_links, [x[1] for x in current_title_and_desc], current_object, [x[0] for x in current_title_and_desc], query)
-        for current in predictions:
-            if current == "not_homepage":
-                labels.append(0)
-            else:
-                labels.append(1)
-
+    if not rf.is_empty(): #create annotations
+        labels = rf.predict(current_links, [x[1] for x in current_title_and_desc], current_object, [x[0] for x in current_title_and_desc], query)
     return render(request, 'search/iframe_page.html', {'links': current_links,
-     'divs': str_divs, 'labels': labels, 'model': rf.model, 'feature': rf.feature,'data_x': data_x, 
+     'divs': str_divs, 'labels': labels, 'model': rf.model,'data_x': data_x, 
     'past_accuracy': past_accuracy, 'past_f1': past_f1, 'past_precision': past_precision, 
     'past_recall': past_recall, 'order': rf.classes, 'class_count': rf.get_class_count()})
 
@@ -240,7 +234,7 @@ def change_model(request, model):
             
     return render(request, 'search/home.html', {'data_x': data_x,
          'past_accuracy': past_accuracy, 'past_f1': past_f1, 'past_precision': past_precision,
-          'past_recall': past_recall, 'order': rf.classes, 'num_datapoints': len(rf.labels), 'model': rf.model, 'feature': rf.feature,
+          'past_recall': past_recall, 'order': rf.classes, 'num_datapoints': len(rf.labels), 'model': rf.model,
           'class_count': rf.get_class_count(), 'object': current_object})
 
 def download_model(request):

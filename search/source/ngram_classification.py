@@ -40,22 +40,11 @@ class NgramClassification:
     -------
     """
     def __init__(self) -> None:
-        self.features = []
         self.labels = []
-        self.classes = ['not_homepage']
-        self.idx = 1 #remove in future (same as len(self.classes))
+        self.classes = ['not_homepage', 'homepage']
         self.model = "Random Forest"
-        self.feature = "Term Frequency"
-        self.engineer_features = ['url_length', 'n_result', 'slash_count', 'dot_count', '.edu', '.com', '.gov', '.net', '.org', '.other', 'alexa_rank', 'keyword_in_netloc', 'keyword_in_path', 'keyword_in_title', 'keyword_in_description']
-        for f in self.engineer_features:
-            self.features.append(f)
-        #for c1 in ascii_lowercase:
-        #    for c2 in ascii_lowercase:
-        #        for c3 in ascii_lowercase:
-        #            self.features.append(c1+c2+c3+'_u')
-        #            self.features.append(c1+c2+c3+'_d')
-        #            self.features.append(c1+c2+c3+'_t')
-
+        self.features = ['url_length', 'n_result', 'slash_count', 'dot_count', '.edu', '.com', '.gov', '.net', '.org', '.other', 'alexa_rank', 'keyword_in_netloc', 'keyword_in_path', 'keyword_in_title', 'keyword_in_description', 'first_person_pronoun_count']
+        self.first_person_pronouns = ['i', 'we', 'me', 'us', 'my', 'mine', 'our', 'ours']
         self.df = pd.DataFrame(columns=self.features)
         pass
 
@@ -106,20 +95,8 @@ class NgramClassification:
         cleaned = formatted_url.replace("https://www.","")
         slash_count = cleaned.count("/")
         dot_count = cleaned.count('.')
-        formatted_url = re.sub(r'[^a-zA-Z]', '', formatted_url)
+        
         formatted_url = formatted_url.lower()
-
-        formatted_title = "" + title
-        formatted_title = re.sub(r'[^a-zA-Z]', '', formatted_title)
-        formatted_title = formatted_title.lower()
-
-        formatted_desc = "" + description
-        formatted_desc = re.sub(r'[^a-zA-Z]', '', formatted_desc)
-        formatted_desc = formatted_desc.lower()
-
-        #tri_grams = self.__generate_trigrams(formatted_url, formatted_desc, formatted_title)
-        #for tri_gram in tri_grams:
-        #    features[self.features.index(tri_gram)] += 1
         
         domain = str(urlparse(url).netloc)
         path = str(urlparse(url).path)
@@ -130,9 +107,9 @@ class NgramClassification:
                 features[self.features.index("keyword_in_netloc")] += 1
             if word_l in path:
                 features[self.features.index("keyword_in_path")] += 1
-            if word_l in formatted_title:
+            if word_l in title:
                 features[self.features.index("keyword_in_title")] += 1
-            if word_l in formatted_desc:
+            if word_l in description:
                 features[self.features.index("keyword_in_description")] += 1
         
         tld = urlparse(url).netloc.split('.')[-1]
@@ -144,11 +121,15 @@ class NgramClassification:
             features[self.features.index('alexa_rank')] = int(bs4.BeautifulSoup(urllib.request.urlopen("http://data.alexa.com/data?cli=10&dat=s&url="+ str(url)).read(), "xml").find("REACH")['RANK'])
         except: #not in alexa rankings 
             features[self.features.index('alexa_rank')] = sys.maxsize
-        print(features[self.features.index('alexa_rank')], "alexa rank")
+        
         if "."+tld in self.features:
             features[self.features.index("."+tld)] = 1
         else:
             features[self.features.index(".other")] = 1
+        
+        for word in description.split(' '):
+            if word in self.first_person_pronouns:
+                features[self.features.index("first_person_pronoun_count")] += 1
 
 
         return features
@@ -168,10 +149,7 @@ class NgramClassification:
         """
         
         self.df.loc[len(self.df.index)] = self.__construct_features(url, description, object, title, n, query)
-        if label not in self.classes:
-            self.classes.append(label)
-            self.idx += 1
-        self.labels.append(self.classes.index(label))
+        self.labels.append(label)
 
     def generate_random_forest(self) -> dict:
         """
@@ -184,17 +162,7 @@ class NgramClassification:
 
         #data = pd.get_dummies(self.df) #probably have to do the same with labels
         features = np.array(self.df)
-        if self.feature == 'Term Frequency':
-            print('tf')
-            pass
-        elif self.feature == 'Term Frequency * Mutual Information':
-            features = self.tf_mi_array(features)
-            print('tf_mi')
-        elif self.feature == 'Term Frequency * Inverse Doc. Freq.':
-            print('tf_idf')
-            features = self.tf_mi_array(features)
         
-        #tf_mi_features = self.tf_mi_array(features)
         train_features, test_features, train_labels, test_labels = train_test_split(features, self.labels, test_size = .3) #Is this too expensive?
         inferences = []
         if self.model == 'Random Forest':
@@ -232,29 +200,11 @@ class NgramClassification:
             A list of predictions with the same length as the list of URLs
         """
 
-        #generate features
-        feature_list = []
-        #df_t = pd.DataFrame(columns=self.features)
-        #print(self.df)
-        #data_test = np.array((len(urls), len(self.features)))
         data_test = []
         for i in range(len(urls)):
             data_test.append(self.__construct_features(urls[i], snippets[i], object, titles[i], i, query))
         data_test = np.array(data_test)
         data_train = np.array(self.df)
-        if self.feature == 'Term Frequency':
-            print('tf')
-            pass
-        elif self.feature == 'Term Frequency * Mutual Information':
-            print('tf_mi')
-            data_test = self.tf_mi_array(data_test)
-            data_train = self.tf_mi_array(data_train)
-        elif self.feature == 'Term Frequency * Inverse Doc. Freq.':
-            print('tf_idf')
-            data_test = self.tf_idf_array(data_test)
-            data_train = self.tf_idf_array(data_train)
-        #data_test_tf_mi = self.tf_mi_array(data_test)
-        #data_train_tf_mi = self.tf_mi_array(data_train)
         inferences = []
         if self.model == 'Random Forest':
             print('rf')
@@ -266,19 +216,11 @@ class NgramClassification:
             svm = make_pipeline(StandardScaler(), SVC(gamma='auto'))
             svm.fit(data_train, self.labels)
             inferences = svm.predict(data_test)
-        #rf = RandomForestClassifier()
-
-        #rf.fit(data_train, self.labels)
-        #predictions = rf.predict(data_test)
-        pred_string = []
-        for num in inferences:
-            if num >= len(self.classes):
-                raise ValueError("Object not in symmetric dictionary on prediction")
-            pred_string.append(self.classes[num])
-        return pred_string
+        return inferences.tolist()
 
     def tf_mi_array(self, arr) -> np.array:
         """
+        DEPRECATED
         Creates tf.mi array
         Parameters
         ----------
@@ -289,7 +231,7 @@ class NgramClassification:
         np.array:
             A numpy array of same dimensions of the input array except with tf.mi values filled in
         """
-        num_class = [0]*self.idx
+        num_class = [0, 0]
         for label in self.labels:
             num_class[label] += 1
         
@@ -332,6 +274,7 @@ class NgramClassification:
 
     def tf_idf_array(self, arr) -> np.array:
         """
+        DEPRECATED
         Creates tf.idf array
         Parameters
         ----------
@@ -398,7 +341,7 @@ class NgramClassification:
         return len(self.labels) == 0
 
     def get_class_count(self):
-        num_class = [0]*5
+        num_class = [0, 0]
         for label in self.labels:
             num_class[label] += 1
         return num_class

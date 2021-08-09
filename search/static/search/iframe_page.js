@@ -70,7 +70,7 @@ window.onload = function() {
         })
     }
 
-    if (labels != null) {
+    if (labels) {
         for (var i = 0; i < labels.length; i++) {
             if (labels[i] == 1) {
                 document.getElementById("y" + (i+1).toString()).classList.add("btn-success");
