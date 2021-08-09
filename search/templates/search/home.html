@@ -137,7 +137,22 @@
         </form>
       </div>
       <div class="row">
+        <form action="/file-object/file" method = "POST", enctype="multipart/form-data" class="form-horizontal">
+          {% csrf_token %}
+          <div class="form-group">
+            <div class="col-md-8">
+              <input type="file" name="file" id="file" required="True" class="form-control" required="True">
+              <input id = "file_object", type="text" name="file_object" class="form-control" style="visibility: hidden;" required="True">
+            </div>
+          </div>
+          <div class="form-group">                    
+            <div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-3" style="margin-bottom:10px;">
+              <button class="btn btn-primary"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Upload </button>
+            </div>
+          </div>
+        </form>
         <div class=text-center style="padding-top: 40px"><a class="btn btn-link" href="/download_dataset" role="button">Download Dataset</a></div>
+        <div class=text-center style="padding-top: 40px"><a class="btn btn-link" href="/download_model" role="button">Download Model</a></div>
       </div>
     </div>
     <div class="col-1">
@@ -162,38 +177,9 @@
           ML Models
         </button>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-          <a class="dropdown-item" id="rf" href="#">Random Forest</a>
-          <a class="dropdown-item" id="svm" href="#">SVM</a>
+          <a class="dropdown-item" id="rf" href="/model/Random Forest">Random Forest</a>
+          <a class="dropdown-item" id="svm" href="/model/SVM">SVM</a>
         </div>
-      </div>
-    </div>
-    <div class="col-3">
-      <div class="dropdown">
-        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdown_features" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Feature Generation Techniques
-        </button>
-        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-          <a class="dropdown-item" id="tf" href="#">Term Frequency</a>
-          <a class="dropdown-item" id="tf_mi" href="#">Term Frequency * Mutual Information</a>
-          <a class="dropdown-item" id="tf_idf" href="#">Term Frequency * Inverse Doc. Freq.</a>
-        </div>
-      </div>
-    </div>
-    <div class="col-2">
-      <button class="btn btn-primary" type="button" id="change_model">Change Model</button>
-    </div>
-    <div class="col-4">
-      
-    </div>
-    <div class="col-1">
-      <button class="btn btn-secondary dropdown-toggle" type="button" id="graph_view" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        Graph View
-      </button>
-      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-        <a class="dropdown-item" id="accuracy" href="#">Accuracy</a>
-        <a class="dropdown-item" id="recall" href="#">Recall</a>
-        <a class="dropdown-item" id="precision" href="#">Precision</a>
-        <a class="dropdown-item" id="f1" href="#">F1</a>
       </div>
     </div>
   </div>
@@ -208,6 +194,7 @@
   {{ past_recall|json_script:"past_recall" }}
   {{ data_x|json_script:"data_x" }}
   {{ order|json_script:"order" }}
+  {{object|json_script:"object"}}
   {% endif %}
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
   <!--Object and query form-->

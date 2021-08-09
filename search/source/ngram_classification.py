@@ -13,6 +13,7 @@ from urllib.parse import urlparse
 import urllib, sys, bs4
 from string import ascii_lowercase
 import math
+import pickle
 
 class NgramClassification:
     """
@@ -207,16 +208,10 @@ class NgramClassification:
             svm.fit(train_features, train_labels)
             inferences = svm.predict(test_features)
 
-        f1 = list(sklearn.metrics.f1_score(test_labels, inferences, average=None, zero_division=0, labels=[0,1,2,3,4]))
-        recall = list(sklearn.metrics.recall_score(test_labels, inferences, average=None, zero_division=0, labels=[0,1,2,3,4]))
-        precision = list(sklearn.metrics.precision_score(test_labels, inferences, average=None, zero_division=0, labels=[0,1,2,3,4]))
+        f1 = sklearn.metrics.f1_score(test_labels, inferences, zero_division=0)
+        recall = sklearn.metrics.recall_score(test_labels, inferences, zero_division=0)
+        precision = sklearn.metrics.precision_score(test_labels, inferences, zero_division=0)
         accuracy = sklearn.metrics.accuracy_score(test_labels, inferences)
-        print("inferences", inferences)
-        print("test labels", test_labels)
-        print("f1", f1)
-        print("recall", recall)
-        print("precision", precision)
-        print("accuracy", accuracy)
         return [accuracy, recall, precision, f1]
 
 
@@ -387,7 +382,9 @@ class NgramClassification:
             A string to the path of the newly created file
         """
         path = "search/temp/temp.csv"
-        self.df.to_csv(path)
+        df_copy = self.df.copy()
+        df_copy['labels'] = self.labels
+        df_copy.to_csv(path)
         return path
 
     def is_empty(self) -> bool:
@@ -405,6 +402,20 @@ class NgramClassification:
         for label in self.labels:
             num_class[label] += 1
         return num_class
+    def download_model(self) -> str:
+        path = "search/temp/temp_model.pickle"
+        data_train = np.array(self.df)
+        model = ""
+        if self.model == 'Random Forest':
+            print('rf')
+            model = RandomForestClassifier()
+            model.fit(data_train, self.labels)
+        elif self.model == 'SVM':
+            print('svm')
+            model = make_pipeline(StandardScaler(), SVC(gamma='auto'))
+            model.fit(data_train, self.labels)
+        pickle.dump(model, open(path, 'wb'))
+        return path
 
                 
 

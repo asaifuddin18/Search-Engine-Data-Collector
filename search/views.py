@@ -1,7 +1,7 @@
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
 from django.http import HttpResponse
-from .forms import QueryForm
+from .forms import QueryForm, UploadFileForm
 from .source.rf import RFCalculator
 from .source.ngram_classification import NgramClassification
 import requests
@@ -17,10 +17,17 @@ current_object = ""
 past_data = []
 data_x = []
 past_accuracy = []
-past_recall = [[],[],[],[],[]]
-past_precision = [[],[],[],[],[]]
-past_f1 = [[],[],[],[],[]]
+past_recall = []
+past_precision = []
+past_f1 = []
 query = ""
+queries = []
+dict_t = {
+    "Professor": ["First Name", "Last Name", "Institution"],
+    "Movie": ["Name", "Year"],
+    "Electronic": ["Name", "Model No./Year"],
+    "Car": ["Make", "Model", "Year"]
+}
 '''def prune_divs(links, divs_):
     divs = []
     links_index = 0
@@ -108,18 +115,45 @@ def edit(request, annotation): #this is submitting annotations
     
     global current_links
     global current_title_and_desc
+    global query
     for i in range(len(current_links)):
         rf.add_datapoint(current_links[i], current_title_and_desc[i][1], truths[i], current_object, current_title_and_desc[i][0], i, query)
     data = rf.generate_random_forest()
     past_accuracy.append(data[0])
-    for i in range(len(data[1])): #iterate through each class
-        past_f1[i].append(data[3][i])
-        past_precision[i].append(data[2][i])
-        past_recall[i].append(data[1][i])
+    past_recall.append(data[1])
+    past_precision.append(data[2])
+    past_f1.append(data[3])
     data_x.append(len(past_accuracy))
+    print(past_accuracy, past_recall, past_precision, past_f1)
+    if len(queries) != 0:
+        query = queries.pop()
+        try:
+            gs = GoogleSearch(query)
+            gs.results_per_page = 15
+            results, divs = gs.get_results()
+            str_divs_ = set_links_title_desc(results, divs)
+            str_divs = str_divs = [str(x) for x in str_divs_]
+        except SearchError:
+            return render(request, 'search/home.html')
+            
+
+        data = [current_object, 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']
+        labels = []
+        if current_object + "_homepage" in rf.classes: #create annotations
+            predictions = rf.predict(current_links, [x[1] for x in current_title_and_desc], current_object, [x[0] for x in current_title_and_desc], query)
+            for current in predictions:
+                if current == "not_homepage":
+                    labels.append(0)
+                else:
+                    labels.append(1)
+        if len(past_data) != 0: #creates stats
+            data = past_data[-1]
+            data.insert(0, 'Total Stats')
+        return render(request, 'search/iframe_page.html', {'links': current_links, 
+        'stats_local': data, 'divs': str_divs, 'labels': labels, 'model': rf.model, 'feature': rf.feature})
     return render(request, 'search/home.html', {'stats_local': data, 'data_x': data_x, 
     'past_accuracy': past_accuracy, 'past_f1': past_f1, 'past_precision': past_precision, 
-    'past_recall': past_recall, 'order': rf.classes, 'model': rf.model, 'feature': rf.feature, 'num_datapoints': len(rf.labels), 'class_count': rf.get_class_count()})
+    'past_recall': past_recall, 'order': rf.classes, 'model': rf.model, 'feature': rf.feature, 'num_datapoints': len(rf.labels), 'class_count': rf.get_class_count(), 'object': current_object})
 
 def handle_input(request):
     print("triggered")
@@ -131,7 +165,7 @@ def handle_input(request):
             query = str(form['q1'].value()) + " " + str(form['q2'].value()) + " " + str(form['q3'].value()) + " " + str(form['q4'].value()) + " " + str(form['q5'].value()) + " " + str(form['q6'].value())
             query = query.strip()
             global current_object
-            current_object = "" + str(form['your_object'].value()).lower()
+            current_object = "" + str(form['your_object'].value())
             try:
                 gs = GoogleSearch(query)
                 gs.results_per_page = 15
@@ -145,7 +179,7 @@ def handle_input(request):
             data = [current_object, 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']
             labels = []
             if current_object + "_homepage" in rf.classes: #create annotations
-                predictions = rf.predict(current_links, [x[1] for x in current_title_and_desc], current_object, [x[0] for x in current_title_and_desc])
+                predictions = rf.predict(current_links, [x[1] for x in current_title_and_desc], current_object, [x[0] for x in current_title_and_desc], query)
                 for current in predictions:
                     if current == "not_homepage":
                         labels.append(0)
@@ -161,8 +195,76 @@ def handle_input(request):
     print(request.method)
     return render(request, 'search/home.html') #form failed
 
+def file_upload(request):
+    if request.method == 'POST':
+        form = UploadFileForm(request.POST, request.FILES)
+        
+        if form.is_valid():
+            global current_object
+            current_object = str(form['file_object'].value())
+            csv_file = request.FILES['file']
+            if not csv_file.name.endswith('.csv'):
+                print("not a csv")
+                return render(request, 'search/home.html')
+            csv_data = csv_file.read().decode("utf-8")
+            
+            lines = list(map(str.rstrip, csv_data.split("\n")))
+            if current_object not in dict_t: #error
+                return render(request, 'search/home.html')
+            input_names = lines[0].split(',')
+            for i in range(len(dict_t[current_object])):
+                if dict_t[current_object][i] != input_names[i]:
+                    return render(request, 'search/home.html') #file formatting error
 
-def download(request):
+            for i in range(1, len(lines)):
+                if lines[i] != "":
+                    fields = []
+                    for field in lines[i].split(','):
+                        if field != "":
+                            fields.append(field)
+                    if len(fields) < len(dict_t[current_object]):# less fields than required
+                        return render(request, 'search/home.html')
+                    temp_query = ""
+                    for field in fields:
+                        temp_query += field + " "
+                    temp_query = temp_query.strip()
+                    queries.append(temp_query)
+            print(queries)
+        else:
+            print("form not valid")
+    else:
+        print("not a post")
+    if len(queries) == 0:
+        print("no queries")
+        return render(request, 'search/home.html')
+    global query
+    query = queries.pop()
+    try:
+        gs = GoogleSearch(query)
+        gs.results_per_page = 15
+        results, divs = gs.get_results()
+        str_divs_ = set_links_title_desc(results, divs)
+        str_divs = str_divs = [str(x) for x in str_divs_]
+    except SearchError:
+        return render(request, 'search/home.html')
+            
+
+    data = [current_object, 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']
+    labels = []
+    if current_object + "_homepage" in rf.classes: #create annotations
+        predictions = rf.predict(current_links, [x[1] for x in current_title_and_desc], current_object, [x[0] for x in current_title_and_desc], query)
+        for current in predictions:
+            if current == "not_homepage":
+                labels.append(0)
+            else:
+                labels.append(1)
+    if len(past_data) != 0: #creates stats
+        data = past_data[-1]
+        data.insert(0, 'Total Stats')
+    return render(request, 'search/iframe_page.html', {'links': current_links, 
+        'stats_local': data, 'divs': str_divs, 'labels': labels, 'model': rf.model, 'feature': rf.feature})
+    
+def download_dataset(request):
     path = rf.download_dataset()
     response = HttpResponse(open(path, 'rb').read())
     response['Content-Type'] = 'text/plain'
@@ -170,24 +272,28 @@ def download(request):
     return response
 
 
-def change_model(request, model, features):
+def change_model(request, model):
     if 'ML Models' not in model:
         rf.model = model
-    if 'Feature Generation Techniques' not in features:
-        rf.feature = features
-    
     if not rf.is_empty():
         data = rf.generate_random_forest()
         past_accuracy.append(data[0])
-        for i in range(len(data[1])):
-            past_f1[i].append(data[3][i])
-            past_precision[i].append(data[2][i])
-            past_recall[i].append(data[1][i])
+        past_recall.append(data[1])
+        past_precision.append(data[2])
+        past_f1.append(data[3])
         data_x.append(len(past_accuracy))
        
             
     return render(request, 'search/home.html', {'data_x': data_x,
          'past_accuracy': past_accuracy, 'past_f1': past_f1, 'past_precision': past_precision,
           'past_recall': past_recall, 'order': rf.classes, 'num_datapoints': len(rf.labels), 'model': rf.model, 'feature': rf.feature,
-          'class_count': rf.get_class_count()})
-    
+          'class_count': rf.get_class_count(), 'object': current_object})
+
+def download_model(request):
+    if rf.is_empty():
+        return render(request, 'search/home.html')
+    path = rf.download_model()
+    response = HttpResponse(open(path, 'rb').read())
+    response['Content-Type'] = 'text/plain'
+    response['Content-Disposition'] = 'attachment; filename=model.pickle'
+    return response

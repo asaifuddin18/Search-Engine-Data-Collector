@@ -9,3 +9,7 @@ class QueryForm(forms.Form):
     q4 = forms.CharField(label='q4', required=False)
     q5 = forms.CharField(label='q5', required=False)
     q6 = forms.CharField(label='q6', required=False)
+class UploadFileForm(forms.Form):
+    file_object = forms.CharField(label='Your Object')
+    file = forms.FileField()
+    
