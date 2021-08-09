@@ -77,44 +77,9 @@
       <span class="fs-4">Annotation Tool</span>
     </a>
     <hr>
-    <ul class="nav nav-pills flex-column mb-auto">
-      <li class="nav-item">
-        <a href="#" class="nav-link text-white" aria-current="page" id="object">
-          <svg class="bi me-2" width="16" height="16"><use xlink:href="#home"/></svg>
-          Object: {{stats_local.0}}
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-link text-white">
-          <svg class="bi me-2" width="16" height="16"><use xlink:href="#speedometer2"/></svg>
-          Accuracy {{stats_local.1}}
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-link text-white">
-          <svg class="bi me-2" width="16" height="16"><use xlink:href="#table"/></svg>
-          Recall: {{stats_local.2}}
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-link text-white">
-          <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"/></svg>
-          Specificity: {{stats_local.3}}
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-link text-white">
-          <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
-          Precision: {{stats_local.4}}
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-link text-white">
-          <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
-          F1 Score: {{stats_local.5}}
-        </a>
-      </li>
-    </ul>
+    <canvas class="my-4" id="myChart" width="50" height="50"></canvas>
+    <hr>
+    <canvas id="myData" width="50" height="50"></canvas>
     <hr>
   </div>
 
@@ -141,10 +106,22 @@
 
 
     <script src="{% static 'search/sidebars.js' %}"></script>
+    {{ class_count|json_script:"class_count" }}
     {{ links|json_script:"links" }}
     {% if labels %}
     {{labels|json_script:"labels"}}
     {% endif %}
+    {% if past_f1 %}
+    {{ past_f1|json_script:"past_f1" }}
+    {{ past_accuracy|json_script:"past_accuracy" }}
+    {{ past_precision|json_script:"past_precision" }}
+    {{ past_recall|json_script:"past_recall" }}
+    {{ data_x|json_script:"data_x" }}
+    {{ order|json_script:"order" }}
+    {{object|json_script:"object"}}
+    {% endif %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
     <script src="{% static 'search/iframe_page.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js" integrity="sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js" integrity="sha384-zNy6FEbO50N+Cg5wap8IKA4M/ZnLJgzc6w2NqACZaK0u0FXfOWRRJOnQtpZun8ha" crossorigin="anonymous"></script>
   </body>
 </html>

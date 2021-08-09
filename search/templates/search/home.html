@@ -196,6 +196,9 @@
   {{ order|json_script:"order" }}
   {{object|json_script:"object"}}
   {% endif %}
+  {% if error %}
+  {{ error|json_script:"error" }}
+  {% endif %}
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
   <!--Object and query form-->
 </div>

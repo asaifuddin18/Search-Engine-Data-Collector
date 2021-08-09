@@ -126,31 +126,8 @@ def edit(request, annotation): #this is submitting annotations
     data_x.append(len(past_accuracy))
     print(past_accuracy, past_recall, past_precision, past_f1)
     if len(queries) != 0:
-        query = queries.pop()
-        try:
-            gs = GoogleSearch(query)
-            gs.results_per_page = 15
-            results, divs = gs.get_results()
-            str_divs_ = set_links_title_desc(results, divs)
-            str_divs = str_divs = [str(x) for x in str_divs_]
-        except SearchError:
-            return render(request, 'search/home.html')
-            
-
-        data = [current_object, 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']
-        labels = []
-        if current_object + "_homepage" in rf.classes: #create annotations
-            predictions = rf.predict(current_links, [x[1] for x in current_title_and_desc], current_object, [x[0] for x in current_title_and_desc], query)
-            for current in predictions:
-                if current == "not_homepage":
-                    labels.append(0)
-                else:
-                    labels.append(1)
-        if len(past_data) != 0: #creates stats
-            data = past_data[-1]
-            data.insert(0, 'Total Stats')
-        return render(request, 'search/iframe_page.html', {'links': current_links, 
-        'stats_local': data, 'divs': str_divs, 'labels': labels, 'model': rf.model, 'feature': rf.feature})
+        query = queries.pop(0)
+        return handle_query(request)
     return render(request, 'search/home.html', {'stats_local': data, 'data_x': data_x, 
     'past_accuracy': past_accuracy, 'past_f1': past_f1, 'past_precision': past_precision, 
     'past_recall': past_recall, 'order': rf.classes, 'model': rf.model, 'feature': rf.feature, 'num_datapoints': len(rf.labels), 'class_count': rf.get_class_count(), 'object': current_object})
@@ -166,34 +143,11 @@ def handle_input(request):
             query = query.strip()
             global current_object
             current_object = "" + str(form['your_object'].value())
-            try:
-                gs = GoogleSearch(query)
-                gs.results_per_page = 15
-                results, divs = gs.get_results()
-                str_divs_ = set_links_title_desc(results, divs)
-                str_divs = str_divs = [str(x) for x in str_divs_]
-            except SearchError:
-                return render(request, 'search/home.html')
-            
-
-            data = [current_object, 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']
-            labels = []
-            if current_object + "_homepage" in rf.classes: #create annotations
-                predictions = rf.predict(current_links, [x[1] for x in current_title_and_desc], current_object, [x[0] for x in current_title_and_desc], query)
-                for current in predictions:
-                    if current == "not_homepage":
-                        labels.append(0)
-                    else:
-                        labels.append(1)
-            if len(past_data) != 0: #creates stats
-                data = past_data[-1]
-                data.insert(0, 'Total Stats')
-            return render(request, 'search/iframe_page.html', {'links': current_links, 
-            'stats_local': data, 'divs': str_divs, 'labels': labels, 'model': rf.model, 'feature': rf.feature})
+            return handle_query(request)
         else:
-            print("FORM NOT VALID")
+            return render(request, 'search/home.html', context={'error': 'Form submission not valid'})
     print(request.method)
-    return render(request, 'search/home.html') #form failed
+    return render(request, 'search/home.html', context={'error': 'POST request was not made'})
 
 def file_upload(request):
     if request.method == 'POST':
@@ -204,17 +158,16 @@ def file_upload(request):
             current_object = str(form['file_object'].value())
             csv_file = request.FILES['file']
             if not csv_file.name.endswith('.csv'):
-                print("not a csv")
-                return render(request, 'search/home.html')
+                return render(request, 'search/home.html', context={'error': 'File is not a CSV'})
             csv_data = csv_file.read().decode("utf-8")
             
             lines = list(map(str.rstrip, csv_data.split("\n")))
             if current_object not in dict_t: #error
-                return render(request, 'search/home.html')
+                return render(request, 'search/home.html', context={'error': 'Object not in dict, update dic_t in views.py?'})
             input_names = lines[0].split(',')
             for i in range(len(dict_t[current_object])):
                 if dict_t[current_object][i] != input_names[i]:
-                    return render(request, 'search/home.html') #file formatting error
+                    return render(request, 'search/home.html', context={'error': 'File is not formatted properly to the object'})
 
             for i in range(1, len(lines)):
                 if lines[i] != "":
@@ -223,7 +176,7 @@ def file_upload(request):
                         if field != "":
                             fields.append(field)
                     if len(fields) < len(dict_t[current_object]):# less fields than required
-                        return render(request, 'search/home.html')
+                        return render(request, 'search/home.html', context={'error': 'Not enough fields on line ' + str(i) + ' of the uploaded CSV'})
                     temp_query = ""
                     for field in fields:
                         temp_query += field + " "
@@ -231,14 +184,17 @@ def file_upload(request):
                     queries.append(temp_query)
             print(queries)
         else:
-            print("form not valid")
+            return render(request, 'search/home.html', context={'error': 'Form submission not valid'})
     else:
-        print("not a post")
+        return render(request, 'search/home.html', context={'error': 'POST request was not made'})
     if len(queries) == 0:
         print("no queries")
-        return render(request, 'search/home.html')
+        return render(request, 'search/home.html', context={'error': 'File had no valid queries'})
     global query
-    query = queries.pop()
+    query = queries.pop(0)
+    return handle_query(request)
+
+def handle_query(request):
     try:
         gs = GoogleSearch(query)
         gs.results_per_page = 15
@@ -246,10 +202,8 @@ def file_upload(request):
         str_divs_ = set_links_title_desc(results, divs)
         str_divs = str_divs = [str(x) for x in str_divs_]
     except SearchError:
-        return render(request, 'search/home.html')
+        return render(request, 'search/home.html', context={'error': 'Error while using Google search engine with query: ' + query})
             
-
-    data = [current_object, 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']
     labels = []
     if current_object + "_homepage" in rf.classes: #create annotations
         predictions = rf.predict(current_links, [x[1] for x in current_title_and_desc], current_object, [x[0] for x in current_title_and_desc], query)
@@ -258,12 +212,12 @@ def file_upload(request):
                 labels.append(0)
             else:
                 labels.append(1)
-    if len(past_data) != 0: #creates stats
-        data = past_data[-1]
-        data.insert(0, 'Total Stats')
-    return render(request, 'search/iframe_page.html', {'links': current_links, 
-        'stats_local': data, 'divs': str_divs, 'labels': labels, 'model': rf.model, 'feature': rf.feature})
-    
+
+    return render(request, 'search/iframe_page.html', {'links': current_links,
+     'divs': str_divs, 'labels': labels, 'model': rf.model, 'feature': rf.feature,'data_x': data_x, 
+    'past_accuracy': past_accuracy, 'past_f1': past_f1, 'past_precision': past_precision, 
+    'past_recall': past_recall, 'order': rf.classes, 'class_count': rf.get_class_count()})
+
 def download_dataset(request):
     path = rf.download_dataset()
     response = HttpResponse(open(path, 'rb').read())

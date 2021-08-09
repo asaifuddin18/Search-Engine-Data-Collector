@@ -23,6 +23,7 @@ var data_x = null;
 var order = null;
 var object = null;
 var class_count = JSON.parse(document.getElementById('class_count').textContent);
+var error_ = null;
 try {
     past_accuracy = JSON.parse(document.getElementById('past_accuracy').textContent);
     past_precision = JSON.parse(document.getElementById('past_precision').textContent);
@@ -31,15 +32,21 @@ try {
     data_x = JSON.parse(document.getElementById('data_x').textContent);
     order = JSON.parse(document.getElementById('order').textContent);
     object = JSON.parse(document.getElementById('object').textContent);
+    error_ = JSON.parse(document.getElementById('error').textContent);
 } catch(error) {
 
 }
 //var features = ["tf", "tf_mi"];
 
 window.onload = function() {
+    if (error_) {
+      alert(error_);
+    }
     if (object) {
         var your_object = document.getElementById("your_object");
         your_object.value = object;
+        var file_object = document.getElementById("file_object");
+        file_object.value = object
         document.getElementById("dropdownMenuButton").style.visibility = "hidden";
         for (var key in dict_t) {
             for (var i = 0; i < qs.length; i++) {
