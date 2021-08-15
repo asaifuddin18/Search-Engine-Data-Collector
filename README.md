@@ -17,17 +17,7 @@ extension (would require having the most common as its own feature and a 'other'
 
 ## TODO
 
-1. ~~Add cars as template (Make, model, year)~~
-
 1. Implement more ML models (ME)
-
-1. When switching models/features, add the new model to the x-labels (also add x,y axis labels)
-
-1. Implement engineered features
-
-2. ~~Add option to switch graph views~~
-
-1. ~~Fix sidebar (add pie-chart to side)~~
 
 1. Add more data analytical options?
 
@@ -35,7 +25,4 @@ extension (would require having the most common as its own feature and a 'other'
 
 3. Make tab open in the same place (maybe as a pop-up?)
 
-1. ~~Use alexa rank https://data.alexa.com/data?cli=10&url=~~
-
 1. Add WHOIS data to features
-

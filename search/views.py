@@ -1,3 +1,36 @@
+'''
+Main module responsible for website backend logic
+...
+Attributes
+----------
+rf: NGramClassification
+    The variable containing the model
+current_links: list(str)
+    A list of linked inputted in the case of a user uploading a CSV file of search queries
+current_title_and_desc: list(tuple(str, str))
+    A list of the title and description of the research results tuples in that specific order
+current_object: str
+    The object the user is quering on, cannot be changed once set
+data_x: list(int)
+    A list representing the X axis of the graph displayed on the home. This is just arange(0, len(past_accuracy))
+past_accuracy: list(int)
+    A list of accuracies outputted from the model after each annotation
+past_recall: list(int)
+    A list of recalls outputted from the model after each annotation
+past_precision: list(int)
+    A list of precisions outputted from the model after each annotation
+past_f1: list(int)
+    A list of f1 scores outputted from the model after each annotation
+query: str
+    The query built from the user inputs in the case of a user manual input
+queries: list(str)
+    The list of queries in the case the user uploads a CSV of queries
+dic_t: dictionary
+    A dictionary mapping a object to its corresponding search template
+
+Methods
+-------
+'''
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -14,7 +47,6 @@ rf = NgramClassification()
 current_links = []
 current_title_and_desc = []
 current_object = ""
-past_data = []
 data_x = []
 past_accuracy = []
 past_recall = []
@@ -48,6 +80,19 @@ dict_t = {
     return divs'''
 
 def clean_title_and_desc(title, desc):
+    '''
+    Helper function that properly formates the title and description to only include letters, numbers, and spaces
+    Parameters
+    ----------
+    title: str
+        The title of a search result
+    desc: str
+        The description of a search result
+    Returns
+    -------
+    tuple(str, str)
+        A tuple of the cleaned title and description
+    '''
     title_ = title.lower().strip()
     desc_ = desc.lower().strip()
     title_ = re.sub(r'[^a-zA-Z0-9 ]', '', title_) #this removes spaces, may need to be changed in the future if using a different feature method
@@ -55,6 +100,19 @@ def clean_title_and_desc(title, desc):
     return title_, desc_
 
 def set_links_title_desc(results, divs):
+    '''
+    Helper function that extracts the title and description of a list of divs from the Google search result page
+    Parameters
+    ----------
+    results: xgoogle.search.SearchResult
+        A search result object from xgoogle contining the title, url, and description
+    divs: list(bs4.element)
+        A list of bs4 elements representing divs from the Google search result page
+    Returns
+    -------
+    list(bs4.element)
+        A list of cleaned and formatted divs
+    '''
     str_divs = []
     global current_links
     global current_title_and_desc
@@ -94,17 +152,27 @@ def set_links_title_desc(results, divs):
             f.write(contents)
         print("Downloaded", links[i])'''
 
-
-
-def test(request):
-    return render(request, 'search/base.html')
-
-
 def home(request):
-    context = {'model': rf.model, 'num_datapoints': len(rf.labels), 'class_count': rf.get_class_count()}
+    '''
+    Function that renders the homepage of the website
+    Returns
+    -------
+    HTML: search/home.html
+    '''
+    context = {'model': rf.model, 'num_datapoints': len(rf.labels), 'class_count': 2}
     return render(request, 'search/home.html', context=context)
 # Create your views here.
 def edit(request, annotation): #this is submitting annotations
+    '''
+    Function that handles the user's submitted annotations and renders the homepage of the website
+    Parameters
+    ----------
+    annotation: str
+        A list of either 0's or 1's where 0 is not a hompeage and 1 is a homepage
+    Returns
+    -------
+    HTML: search/home.html
+    '''
     truths = [int(c) for c in annotation]
     #for c in annotation:
     #    if c == '0':
@@ -117,7 +185,7 @@ def edit(request, annotation): #this is submitting annotations
     global current_title_and_desc
     global query
     for i in range(len(current_links)):
-        rf.add_datapoint(current_links[i], current_title_and_desc[i][1], truths[i], current_object, current_title_and_desc[i][0], i, query)
+        rf.add_datapoint(current_links[i], current_title_and_desc[i][1], truths[i], current_title_and_desc[i][0], i, query)
     data = rf.generate_random_forest()
     past_accuracy.append(data[0])
     past_recall.append(data[1])
@@ -130,9 +198,15 @@ def edit(request, annotation): #this is submitting annotations
         return handle_query(request)
     return render(request, 'search/home.html', {'stats_local': data, 'data_x': data_x, 
     'past_accuracy': past_accuracy, 'past_f1': past_f1, 'past_precision': past_precision, 
-    'past_recall': past_recall, 'order': rf.classes, 'model': rf.model, 'num_datapoints': len(rf.labels), 'class_count': rf.get_class_count(), 'object': current_object})
+    'past_recall': past_recall, 'order': ['not_homepage', 'homepage'], 'model': rf.model, 'num_datapoints': len(rf.labels), 'class_count': 2, 'object': current_object})
 
 def handle_input(request):
+    '''
+    Function that handles the user's manual query input & renders the annotaton page
+    Returns
+    -------
+    HTML: search/iframe_page.html
+    '''
     print("triggered")
     if request.method == 'POST':
         print("POST request")
@@ -150,6 +224,12 @@ def handle_input(request):
     return render(request, 'search/home.html', context={'error': 'POST request was not made'})
 
 def file_upload(request):
+    '''
+    Function that handles the user's CSV file upload & renders the annotation page
+    Returns
+    -------
+    HTML: search/iframe_page.html
+    '''
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         
@@ -195,6 +275,12 @@ def file_upload(request):
     return handle_query(request)
 
 def handle_query(request):
+    '''
+    Helper function that renders the iframe_page give the query global variable
+    Returns
+    -------
+    HTML: search/iframe_page.html
+    '''
     try:
         gs = GoogleSearch(query)
         gs.results_per_page = 15
@@ -210,9 +296,15 @@ def handle_query(request):
     return render(request, 'search/iframe_page.html', {'links': current_links,
      'divs': str_divs, 'labels': labels, 'model': rf.model,'data_x': data_x, 
     'past_accuracy': past_accuracy, 'past_f1': past_f1, 'past_precision': past_precision, 
-    'past_recall': past_recall, 'order': rf.classes, 'class_count': rf.get_class_count()})
+    'past_recall': past_recall, 'order': ['not_homepage', 'homepage'], 'class_count': 2})
 
 def download_dataset(request):
+    '''
+    Function that handles when the user attempts to download the dataset from the website
+    Returns
+    -------
+    File: CSV of dataset
+    '''
     path = rf.download_dataset()
     response = HttpResponse(open(path, 'rb').read())
     response['Content-Type'] = 'text/plain'
@@ -221,6 +313,12 @@ def download_dataset(request):
 
 
 def change_model(request, model):
+    '''
+    Function that handles when the user attempts to change the current model type
+    Returns
+    -------
+    HTML: search/home.html
+    '''
     if 'ML Models' not in model:
         rf.model = model
     if not rf.is_empty():
@@ -234,10 +332,16 @@ def change_model(request, model):
             
     return render(request, 'search/home.html', {'data_x': data_x,
          'past_accuracy': past_accuracy, 'past_f1': past_f1, 'past_precision': past_precision,
-          'past_recall': past_recall, 'order': rf.classes, 'num_datapoints': len(rf.labels), 'model': rf.model,
-          'class_count': rf.get_class_count(), 'object': current_object})
+          'past_recall': past_recall, 'order': ['not_homepage', 'homepage'], 'num_datapoints': len(rf.labels), 'model': rf.model,
+          'class_count': 2, 'object': current_object})
 
 def download_model(request):
+    '''
+    Function that handles when the user attempts to download the curent model
+    Returns
+    -------
+    File: Pickle file of the model
+    '''
     if rf.is_empty():
         return render(request, 'search/home.html')
     path = rf.download_model()

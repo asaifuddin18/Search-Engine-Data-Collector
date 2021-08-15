@@ -27,21 +27,15 @@ class NgramClassification:
         List of true values of URL
     df: DataFrame
         Pandas DataFrame that holds all the data
-    sd: SymmetricDictionary
-        A symmetric dictionary so sd[k] = v == sd[v] = k
-    idx: int
-        The number of unique labels 1-indexed
     model: str
         The current type of model being used
-    feature: str
-        The current feature extraction method
-    
+    first_person_pronouns
+        A list of predefined first person pronouns to detect in a given Google search result description
     Methods
     -------
     """
     def __init__(self) -> None:
         self.labels = []
-        self.classes = ['not_homepage', 'homepage']
         self.model = "Random Forest"
         self.features = ['url_length', 'n_result', 'slash_count', 'dot_count', '.edu', '.com', '.gov', '.net', '.org', '.other', 'alexa_rank', 'keyword_in_netloc', 'keyword_in_path', 'keyword_in_title', 'keyword_in_description', 'first_person_pronoun_count']
         self.first_person_pronouns = ['i', 'we', 'me', 'us', 'my', 'mine', 'our', 'ours']
@@ -50,6 +44,7 @@ class NgramClassification:
 
     def __generate_trigrams(self, formatted_url, description, title) -> list():
         """
+        DEPRECATED
         Helper function that constructs the tri-grams required for feature generation
         Parameters
         ----------
@@ -60,6 +55,7 @@ class NgramClassification:
         title: str
             The text that appears hyperlinked
         Returns
+        -------
         list
             A list of strings of the tri-grams generated from the url
         """
@@ -73,7 +69,7 @@ class NgramClassification:
         
         return tri_grams
     
-    def __construct_features(self, url, description, object, title, n, query) -> list():
+    def __construct_features(self, url, description, title, n, query) -> list():
         """
         Helper function that constructs the features required for the Random Forest
         Parameters
@@ -84,6 +80,10 @@ class NgramClassification:
             The text snippet that google provides under the URL in a google search
         title: str
             The text that appears hyperlinked
+        n: int
+            The index that the Google search result is within the page
+        query: string
+            The original query that the user inputted
         Returns
         -------
         list
@@ -134,21 +134,24 @@ class NgramClassification:
 
         return features
 
-    def add_datapoint(self, url, description, label, object, title, n, query) -> None:
+    def add_datapoint(self, url, description, label, title, n, query) -> None:
         """
         Parameters
         ----------
         url: str
             The URL of the datapoint
-        snippet: str
-            The text snippet that google provides under the URL in a google search
+        description: str
+            The text description that google provides under the URL in a google search
         label: string
             The ground-truth provided by the user
-        object: string
-            The name of the object
+        title: str
+            The title of the Google search result
+        n: The index the Google search result within the page
+        query: str
+            The query inputted by the user
         """
         
-        self.df.loc[len(self.df.index)] = self.__construct_features(url, description, object, title, n, query)
+        self.df.loc[len(self.df.index)] = self.__construct_features(url, description, title, n, query)
         self.labels.append(label)
 
     def generate_random_forest(self) -> dict:
@@ -183,7 +186,7 @@ class NgramClassification:
         return [accuracy, recall, precision, f1]
 
 
-    def predict(self, urls, snippets, object, titles, query) -> list():
+    def predict(self, urls, snippets, titles, query) -> list():
         """
         Creates predictions based on input URLs
         Parameters
@@ -194,6 +197,8 @@ class NgramClassification:
             A list of strings that are the descriptions google returns alongside URLs on search queries
         titles: list
             A list of titles that are hyperlinked to the URL returned upon search queries
+        query: str
+            The query inputted by the user
         Returns
         -------
         list:
@@ -202,7 +207,7 @@ class NgramClassification:
 
         data_test = []
         for i in range(len(urls)):
-            data_test.append(self.__construct_features(urls[i], snippets[i], object, titles[i], i, query))
+            data_test.append(self.__construct_features(urls[i], snippets[i], titles[i], i, query))
         data_test = np.array(data_test)
         data_train = np.array(self.df)
         inferences = []
@@ -341,11 +346,21 @@ class NgramClassification:
         return len(self.labels) == 0
 
     def get_class_count(self):
+        '''
+        DEPRECATED
+        '''
         num_class = [0, 0]
         for label in self.labels:
             num_class[label] += 1
         return num_class
     def download_model(self) -> str:
+        '''
+        Converts the Scikit-learn model into a pickle file
+        Returns
+        -------
+        str:
+            A string of the path to the created pickle file
+        '''
         path = "search/temp/temp_model.pickle"
         data_train = np.array(self.df)
         model = ""
