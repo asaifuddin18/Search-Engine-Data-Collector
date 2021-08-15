@@ -30,7 +30,9 @@ try {
 } catch(error) {
     
 }
-
+/**
+ * Logic for submitting annotations
+ */
 document.getElementById('submit_annotation').addEventListener("click", function(event) {
     var res = document.getElementsByClassName("ezO2md");
     annotation_string = "";
@@ -48,7 +50,9 @@ document.getElementById('submit_annotation').addEventListener("click", function(
     }
     document.location.href = "/" +'edit/' + annotation_string;
 })
-
+/**
+ * Logic for toggling annotation buttons & pre-selecting inferences from ML model
+ */
 window.onload = function() {
     var res = document.getElementsByClassName("ezO2md");
     for (var i = 1; i < res.length + 1; i++) {
@@ -80,6 +84,9 @@ window.onload = function() {
         }
     }
 }
+/**
+ * Initializes graph
+ */
 var ctx = document.getElementById("myChart");
 var myChart = new Chart(ctx, {
     type: 'line',
@@ -156,6 +163,9 @@ var myChart = new Chart(ctx, {
         }
     }
 });
+/**
+ * Initializes pie graph
+ */
 var pieData = {
     labels: order,
     datasets: [

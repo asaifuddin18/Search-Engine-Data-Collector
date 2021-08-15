@@ -347,12 +347,18 @@ class NgramClassification:
 
     def get_class_count(self):
         '''
-        DEPRECATED
+        Gets the frequency of not_hompage and homepage
+        Returns
+        -------
+        list:
+            List of size 2, index 0 = frequency of not_homepage, index 1 = frequency of homepage
         '''
-        num_class = [0, 0]
-        for label in self.labels:
-            num_class[label] += 1
-        return num_class
+        #num_class = [0, 0]
+        #for label in self.labels:
+        #    num_class[label] += 1
+        #return num_class
+        s = sum(self.labels)
+        return [len(self.labels) - s, s]
     def download_model(self) -> str:
         '''
         Converts the Scikit-learn model into a pickle file

@@ -35,7 +35,7 @@ from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
 from django.http import HttpResponse
 from .forms import QueryForm, UploadFileForm
-from .source.rf import RFCalculator
+#from .source.rf import RFCalculator
 from .source.ngram_classification import NgramClassification
 import requests
 from urllib.parse import urlparse
@@ -159,7 +159,7 @@ def home(request):
     -------
     HTML: search/home.html
     '''
-    context = {'model': rf.model, 'num_datapoints': len(rf.labels), 'class_count': 2}
+    context = {'model': rf.model, 'num_datapoints': len(rf.labels), 'class_count': rf.get_class_count()}
     return render(request, 'search/home.html', context=context)
 # Create your views here.
 def edit(request, annotation): #this is submitting annotations
@@ -198,7 +198,7 @@ def edit(request, annotation): #this is submitting annotations
         return handle_query(request)
     return render(request, 'search/home.html', {'stats_local': data, 'data_x': data_x, 
     'past_accuracy': past_accuracy, 'past_f1': past_f1, 'past_precision': past_precision, 
-    'past_recall': past_recall, 'order': ['not_homepage', 'homepage'], 'model': rf.model, 'num_datapoints': len(rf.labels), 'class_count': 2, 'object': current_object})
+    'past_recall': past_recall, 'order': ['not_homepage', 'homepage'], 'model': rf.model, 'num_datapoints': len(rf.labels), 'class_count': rf.get_class_count(), 'object': current_object})
 
 def handle_input(request):
     '''
@@ -296,7 +296,7 @@ def handle_query(request):
     return render(request, 'search/iframe_page.html', {'links': current_links,
      'divs': str_divs, 'labels': labels, 'model': rf.model,'data_x': data_x, 
     'past_accuracy': past_accuracy, 'past_f1': past_f1, 'past_precision': past_precision, 
-    'past_recall': past_recall, 'order': ['not_homepage', 'homepage'], 'class_count': 2})
+    'past_recall': past_recall, 'order': ['not_homepage', 'homepage'], 'class_count': rf.get_class_count()})
 
 def download_dataset(request):
     '''
@@ -333,7 +333,7 @@ def change_model(request, model):
     return render(request, 'search/home.html', {'data_x': data_x,
          'past_accuracy': past_accuracy, 'past_f1': past_f1, 'past_precision': past_precision,
           'past_recall': past_recall, 'order': ['not_homepage', 'homepage'], 'num_datapoints': len(rf.labels), 'model': rf.model,
-          'class_count': 2, 'object': current_object})
+          'class_count': rf.get_class_count(), 'object': current_object})
 
 def download_model(request):
     '''

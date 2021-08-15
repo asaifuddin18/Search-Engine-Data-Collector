@@ -1,3 +1,15 @@
+/**
+ * Script that supports home page (search/home.html)
+ * Attributes
+ * ----------
+ * dict_t: dictionary
+ *  Dictionary that maps objects names to its query template
+ * models: dictonary
+ *  Dictionary that maps model short name to its long name
+ * qs: list(str)
+ *  List of the user input fields IDs
+ */
+
 var dict_t = {
     "Professor": ["First Name", "Last Name", "Institution"],
     "Movie": ["Name", "Year"],
@@ -9,11 +21,6 @@ var models = {
     "rf": "Random Forest",
     "svm": "SVM"
 };
-var features = {
-    "tf": "Term Frequency",
-    "tf_mi": "Term Frequency * Mutual Information",
-    "tf_idf": "Term Frequency * Inverse Doc. Freq."
-};
 var qs = ["q1", "q2", "q3", "q4", "q5", "q6"];
 var past_accuracy = null;
 var past_precision = null;
@@ -24,6 +31,9 @@ var order = null;
 var object = null;
 var class_count = JSON.parse(document.getElementById('class_count').textContent);
 var error_ = null;
+/**
+ * Attempts to assign values from Django template
+ */
 try {
     past_accuracy = JSON.parse(document.getElementById('past_accuracy').textContent);
     past_precision = JSON.parse(document.getElementById('past_precision').textContent);
@@ -36,12 +46,17 @@ try {
 } catch(error) {
 
 }
-//var features = ["tf", "tf_mi"];
 
 window.onload = function() {
+  /**
+   * If an error is passed, alert it to the user
+   */
     if (error_) {
       alert(error_);
     }
+    /**
+     * If the object is already defined, prevent the user from changing the query template
+     */
     if (object) {
         var your_object = document.getElementById("your_object");
         your_object.value = object;
@@ -62,6 +77,9 @@ window.onload = function() {
             }
         }
     }
+    /**
+     * Logic for changing query templates
+     */
     for (var key in dict_t) {
         document.getElementById(key).addEventListener("click", function(event) {
             //var queryBox = document.getElementById("your_queries");
@@ -86,7 +104,9 @@ window.onload = function() {
         })
     }
 }
-
+/**
+ * Initializes graph
+ */
 var ctx = document.getElementById("myChart");
 var myChart = new Chart(ctx, {
     type: 'line',
@@ -156,7 +176,9 @@ var myChart = new Chart(ctx, {
         }
     }
 });
-//pie
+/**
+ * Initializes pie graph
+ */
 var pieData = {
     labels: order,
     datasets: [
