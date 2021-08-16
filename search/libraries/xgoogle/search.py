@@ -143,12 +143,13 @@ class GoogleSearch(object):
 
     results_per_page = property(_get_results_per_page, _set_results_par_page)
 
-    def get_results(self):
+    def get_results(self, page=None):
         """ Gets a page of results """
         if self.eor:
             return []
         MAX_VALUE = 1000000
-        page = self._get_results_page()
+        if not page:
+            page = self._get_results_page()
         
         #search_info = self._extract_info(page)
         results, divs = self._extract_results(page)

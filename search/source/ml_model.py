@@ -15,9 +15,9 @@ from string import ascii_lowercase
 import math
 import pickle
 
-class NgramClassification:
+class MLModel:
     """
-    Class used to organize data and make predictions using a Random Forest
+    Class used to organize data and make predictions using a selected Machine Learning model
     ...
     Attributes
     ----------
@@ -31,6 +31,8 @@ class NgramClassification:
         The current type of model being used
     first_person_pronouns
         A list of predefined first person pronouns to detect in a given Google search result description
+    urls: list of strings
+        The list of URLs from the Google Search Page
     Methods
     -------
     """
@@ -40,6 +42,7 @@ class NgramClassification:
         self.features = ['url_length', 'n_result', 'slash_count', 'dot_count', '.edu', '.com', '.gov', '.net', '.org', '.other', 'alexa_rank', 'keyword_in_netloc', 'keyword_in_path', 'keyword_in_title', 'keyword_in_description', 'first_person_pronoun_count']
         self.first_person_pronouns = ['i', 'we', 'me', 'us', 'my', 'mine', 'our', 'ours']
         self.df = pd.DataFrame(columns=self.features)
+        self.urls = []
         pass
 
     def __generate_trigrams(self, formatted_url, description, title) -> list():
@@ -153,6 +156,7 @@ class NgramClassification:
         
         self.df.loc[len(self.df.index)] = self.__construct_features(url, description, title, n, query)
         self.labels.append(label)
+        self.urls.append(url)
 
     def generate_random_forest(self) -> dict:
         """
@@ -332,6 +336,7 @@ class NgramClassification:
         path = "search/temp/temp.csv"
         df_copy = self.df.copy()
         df_copy['labels'] = self.labels
+        df_copy['urls'] = self.urls
         df_copy.to_csv(path)
         return path
 
@@ -380,6 +385,3 @@ class NgramClassification:
             model.fit(data_train, self.labels)
         pickle.dump(model, open(path, 'wb'))
         return path
-
-                
-

@@ -36,14 +36,14 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from .forms import QueryForm, UploadFileForm
 #from .source.rf import RFCalculator
-from .source.ngram_classification import NgramClassification
+from .source.ml_model import MLModel
 import requests
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup as Soup
 import bs4
 from .libraries.xgoogle.search import GoogleSearch, SearchError
 import re
-rf = NgramClassification()
+rf = MLModel()
 current_links = []
 current_title_and_desc = []
 current_object = ""
@@ -286,13 +286,13 @@ def handle_query(request):
         gs.results_per_page = 15
         results, divs = gs.get_results()
         str_divs_ = set_links_title_desc(results, divs)
-        str_divs = str_divs = [str(x) for x in str_divs_]
+        str_divs = [str(x) for x in str_divs_]
     except SearchError:
         return render(request, 'search/home.html', context={'error': 'Error while using Google search engine with query: ' + query})
             
     labels = []
     if not rf.is_empty(): #create annotations
-        labels = rf.predict(current_links, [x[1] for x in current_title_and_desc], current_object, [x[0] for x in current_title_and_desc], query)
+        labels = rf.predict(current_links, [x[1] for x in current_title_and_desc], [x[0] for x in current_title_and_desc], query)
     return render(request, 'search/iframe_page.html', {'links': current_links,
      'divs': str_divs, 'labels': labels, 'model': rf.model,'data_x': data_x, 
     'past_accuracy': past_accuracy, 'past_f1': past_f1, 'past_precision': past_precision, 
