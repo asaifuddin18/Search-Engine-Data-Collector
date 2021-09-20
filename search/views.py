@@ -193,6 +193,7 @@ def edit(request, annotation): #this is submitting annotations
     past_f1.append(data[3])
     data_x.append(len(past_accuracy))
     print(past_accuracy, past_recall, past_precision, past_f1)
+    rf.download_dataset()
     if len(queries) != 0:
         query = queries.pop(0)
         return handle_query(request)

@@ -18,6 +18,7 @@ var order = null;
 var object = null;
 var class_count = JSON.parse(document.getElementById('class_count').textContent);
 var error_ = null;
+wordsToPass = [];
 try {
     past_accuracy = JSON.parse(document.getElementById('past_accuracy').textContent);
     past_precision = JSON.parse(document.getElementById('past_precision').textContent);
@@ -55,6 +56,17 @@ document.getElementById('submit_annotation').addEventListener("click", function(
  */
 window.onload = function() {
     var res = document.getElementsByClassName("ezO2md");
+    document.getElementById("add_feature").addEventListener("click", function(event) {
+        var text = "";
+        if (window.getSelection) {
+            text = window.getSelection().toString();
+        } else if (document.selection && document.selection.type != "Control") {
+            text = document.selection.createRange().text;
+        }
+        var toAlert = "Word: " + text + " added";
+        wordsToPass.push(text);
+        alert(toAlert);
+    })
     for (var i = 1; i < res.length + 1; i++) {
         document.getElementById("y" + i.toString()).addEventListener("click", function(event) {
             event.target.classList.add("btn-success");

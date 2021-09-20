@@ -14,7 +14,7 @@ import urllib, sys, bs4
 from string import ascii_lowercase
 import math
 import pickle
-
+from os.path import exists
 class MLModel:
     """
     Class used to organize data and make predictions using a selected Machine Learning model
@@ -41,8 +41,15 @@ class MLModel:
         self.model = "Random Forest"
         self.features = ['url_length', 'n_result', 'slash_count', 'dot_count', '.edu', '.com', '.gov', '.net', '.org', '.other', 'alexa_rank', 'keyword_in_netloc', 'keyword_in_path', 'keyword_in_title', 'keyword_in_description', 'first_person_pronoun_count']
         self.first_person_pronouns = ['i', 'we', 'me', 'us', 'my', 'mine', 'our', 'ours']
-        self.df = pd.DataFrame(columns=self.features)
         self.urls = []
+        if exists("search/data/dataset.csv"): #this only allows 1 type of entity to be searched, change it, perhaps create file on first search & pass entity through
+            self.df = pd.from_csv("search/data/dataset.csv")
+            self.labels = list(self.df['labels'])
+            self.urls = list(self.df['urls'])
+            del self.df['urls']
+            del self.df['labels']
+        else:
+            self.df = pd.DataFrame(columns=self.features)
         pass
 
     def __generate_trigrams(self, formatted_url, description, title) -> list():
@@ -333,7 +340,7 @@ class MLModel:
         str:
             A string to the path of the newly created file
         """
-        path = "search/temp/temp.csv"
+        path = "search/data/dataset.csv"
         df_copy = self.df.copy()
         df_copy['labels'] = self.labels
         df_copy['urls'] = self.urls
