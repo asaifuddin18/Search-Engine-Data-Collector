@@ -42,6 +42,7 @@ class MLModel:
         self.words = []
         self.features = ['url_length', 'n_result', 'slash_count', 'dot_count', '.edu', '.com', '.gov', '.net', '.org', '.other', 'alexa_rank', 'keyword_in_netloc', 'keyword_in_path', 'keyword_in_title', 'keyword_in_description', 'first_person_pronoun_count']
         self.first_person_pronouns = ['i', 'we', 'me', 'us', 'my', 'mine', 'our', 'ours']
+        self.info = []
         self.urls = []
         if exists("search/data/dataset.csv"): #this only allows 1 type of entity to be searched, change it, perhaps create file on first search & pass entity through
             self.df = pd.from_csv("search/data/dataset.csv")
@@ -49,8 +50,13 @@ class MLModel:
             self.urls = list(self.df['urls'])
             del self.df['urls']
             del self.df['labels']
+            self.features = list(self.df.columns)
         else:
             self.df = pd.DataFrame(columns=self.features)
+        if exists("search/data/info.pickle"):
+            with open("search/data/info.pickle") as f:
+                f.seek(0)
+                self.info = pickle.load(f)
         pass
     
     def add_word(self, word):
@@ -58,6 +64,9 @@ class MLModel:
             self.words.append(word.lower())
             self.features.append(word.lower())
             self.df[word.lower()] = 0
+        for i in range(len(self.data)):
+            for val in self.data[i]:
+                self.df.at[i, word] = val.count(word)
 
     def __generate_trigrams(self, formatted_url, description, title) -> list():
         """
@@ -136,6 +145,7 @@ class MLModel:
         features[1] = n
         features[2] = slash_count
         features[3] = dot_count
+        self.info.append([url, title, description])
         try:
             features[self.features.index('alexa_rank')] = int(bs4.BeautifulSoup(urllib.request.urlopen("http://data.alexa.com/data?cli=10&dat=s&url="+ str(url)).read(), "xml").find("REACH")['RANK'])
         except: #not in alexa rankings 
@@ -173,6 +183,9 @@ class MLModel:
         self.df.loc[len(self.df.index)] = self.__construct_features(url, description, title, n, query)
         self.labels.append(label)
         self.urls.append(url)
+        self.df.to_csv("search/data/dataset.csv")
+        pickle.dump(self.info, open("search/data/info.pickle", 'wb'))
+
 
     def generate_random_forest(self) -> dict:
         """
