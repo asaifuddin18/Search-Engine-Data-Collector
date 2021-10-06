@@ -161,6 +161,9 @@ def home(request):
     '''
     context = {'model': rf.model, 'num_datapoints': len(rf.labels), 'class_count': rf.get_class_count()}
     return render(request, 'search/home.html', context=context)
+
+def no_words(request, annotation):
+    return edit(request, annotation, "")
 # Create your views here.
 def edit(request, annotation, words): #this is submitting annotations
     '''

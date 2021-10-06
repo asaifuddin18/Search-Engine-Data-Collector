@@ -13,6 +13,7 @@ URL: 'file-object/file', url to be entered when user uploads and submits a CSV f
 urlpatterns = [
     path('', views.home, name='search-home'),
     path('edit/<str:annotation>/<str:words>', views.edit, name='edit'),
+    path('edit/<str:annotation>/', views.no_words, name='no_words'),
     path('your-object/q1/q2/q3/q4/q5/q6', views.handle_input, name='input'),
     path('download_dataset/', views.download_dataset, name='download_dataset'),
     path('model/<str:model>/', views.change_model, name='change_model'),

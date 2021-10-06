@@ -40,33 +40,37 @@ class MLModel:
         self.labels = []
         self.model = "Random Forest"
         self.words = []
-        self.features = ['url_length', 'n_result', 'slash_count', 'dot_count', '.edu', '.com', '.gov', '.net', '.org', '.other', 'alexa_rank', 'keyword_in_netloc', 'keyword_in_path', 'keyword_in_title', 'keyword_in_description', 'first_person_pronoun_count']
-        self.first_person_pronouns = ['i', 'we', 'me', 'us', 'my', 'mine', 'our', 'ours']
-        self.info = []
+        self.features = ['url_length', 'n_result', 'slash_count', 'dot_count', '.edu', '.com', '.gov', '.net', '.org', '.other', 'alexa_rank', 'keyword_in_netloc', 'keyword_in_path', 'keyword_in_title', 'keyword_in_description',]
         self.urls = []
+        self.titles = []
+        self.descriptions = []
         if exists("search/data/dataset.csv"): #this only allows 1 type of entity to be searched, change it, perhaps create file on first search & pass entity through
-            self.df = pd.from_csv("search/data/dataset.csv")
+            eng_features = len(self.features)
+            self.df = pd.read_csv("search/data/dataset.csv")
             self.labels = list(self.df['labels'])
             self.urls = list(self.df['urls'])
+            self.titles = list(self.df['titles'])
+            self.descriptions = list(self.df['descriptions'])
             del self.df['urls']
             del self.df['labels']
+            del self.df['titles']
+            del self.df['descriptions']
             self.features = list(self.df.columns)
+            self.words = self.features[eng_features:]
         else:
             self.df = pd.DataFrame(columns=self.features)
-        if exists("search/data/info.pickle"):
-            with open("search/data/info.pickle") as f:
-                f.seek(0)
-                self.info = pickle.load(f)
         pass
     
     def add_word(self, word):
-        if word.lower() not in self.words:
-            self.words.append(word.lower())
-            self.features.append(word.lower())
-            self.df[word.lower()] = 0
-        for i in range(len(self.data)):
-            for val in self.data[i]:
-                self.df.at[i, word] = val.count(word)
+        word = word.lower()
+        if word not in self.features:
+            self.words.append(word)
+            self.features.append(word)
+            self.df[word] = 0
+        i = 0
+        for idx in self.df.index:
+                self.df[word][idx] = int(self.urls[i].count(word) + self.titles[i].count(word) + self.descriptions[i].count(word))
+                i += 1
 
     def __generate_trigrams(self, formatted_url, description, title) -> list():
         """
@@ -129,23 +133,22 @@ class MLModel:
         query_words = query.split()
         for word in query_words:
             word_l = word.lower()
-            if word_l in domain:
-                features[self.features.index("keyword_in_netloc")] += 1
-            if word_l in path:
-                features[self.features.index("keyword_in_path")] += 1
-            if word_l in title:
-                features[self.features.index("keyword_in_title")] += 1
-            if word_l in description:
-                features[self.features.index("keyword_in_description")] += 1
+            #if word_l in domain:
+            features[self.features.index("keyword_in_netloc")] = domain.count(word)
+            #if word_l in path:
+            features[self.features.index("keyword_in_path")] = path.count(word)
+            #if word_l in title:
+            features[self.features.index("keyword_in_title")] = title.count(word)
+            #if word_l in description:
+            features[self.features.index("keyword_in_description")] = description.count(word)
         for word in self.words:
-            features[self.features.index(word)] += domain.count(word) + path.count(word) + title.count(word) + description.count(word)
+            features[self.features.index(word)] = int(formatted_url.count(word) + title.count(word) + description.count(word))
             
         tld = urlparse(url).netloc.split('.')[-1]
         features[0] = len(formatted_url)
         features[1] = n
         features[2] = slash_count
         features[3] = dot_count
-        self.info.append([url, title, description])
         try:
             features[self.features.index('alexa_rank')] = int(bs4.BeautifulSoup(urllib.request.urlopen("http://data.alexa.com/data?cli=10&dat=s&url="+ str(url)).read(), "xml").find("REACH")['RANK'])
         except: #not in alexa rankings 
@@ -155,10 +158,6 @@ class MLModel:
             features[self.features.index("."+tld)] = 1
         else:
             features[self.features.index(".other")] = 1
-        
-        for word in description.split(' '):
-            if word in self.first_person_pronouns:
-                features[self.features.index("first_person_pronoun_count")] += 1
 
 
         return features
@@ -179,12 +178,14 @@ class MLModel:
         query: str
             The query inputted by the user
         """
-        
         self.df.loc[len(self.df.index)] = self.__construct_features(url, description, title, n, query)
         self.labels.append(label)
         self.urls.append(url)
-        self.df.to_csv("search/data/dataset.csv")
-        pickle.dump(self.info, open("search/data/info.pickle", 'wb'))
+        #self.titles.append(re.sub(r'\W+', '', title))
+        self.titles.append(title)
+        self.descriptions.append(description)
+        #self.descriptions.append(re.sub(r'\W+', '', description))
+        self.download_dataset()
 
 
     def generate_random_forest(self) -> dict:
@@ -366,6 +367,8 @@ class MLModel:
         df_copy = self.df.copy()
         df_copy['labels'] = self.labels
         df_copy['urls'] = self.urls
+        df_copy['titles'] = self.titles
+        df_copy['descriptions'] = self.descriptions
         df_copy.to_csv(path)
         return path
 
@@ -415,7 +418,7 @@ class MLModel:
         pickle.dump(model, open(path, 'wb'))
         return path
 
-    def get_url_and_labels(self) -> tuple(str, int):
+    def get_url_and_labels(self):
         '''
         Retrieves URL and labels as tuple
         Returns
