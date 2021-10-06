@@ -39,6 +39,7 @@ class MLModel:
     def __init__(self) -> None:
         self.labels = []
         self.model = "Random Forest"
+        self.words = []
         self.features = ['url_length', 'n_result', 'slash_count', 'dot_count', '.edu', '.com', '.gov', '.net', '.org', '.other', 'alexa_rank', 'keyword_in_netloc', 'keyword_in_path', 'keyword_in_title', 'keyword_in_description', 'first_person_pronoun_count']
         self.first_person_pronouns = ['i', 'we', 'me', 'us', 'my', 'mine', 'our', 'ours']
         self.urls = []
@@ -51,6 +52,12 @@ class MLModel:
         else:
             self.df = pd.DataFrame(columns=self.features)
         pass
+    
+    def add_word(self, word):
+        if word.lower() not in self.words:
+            self.words.append(word.lower())
+            self.features.append(word.lower())
+            self.df[word.lower()] = 0
 
     def __generate_trigrams(self, formatted_url, description, title) -> list():
         """
@@ -121,7 +128,9 @@ class MLModel:
                 features[self.features.index("keyword_in_title")] += 1
             if word_l in description:
                 features[self.features.index("keyword_in_description")] += 1
-        
+        for word in self.words:
+            features[self.features.index(word)] += domain.count(word) + path.count(word) + title.count(word) + description.count(word)
+            
         tld = urlparse(url).netloc.split('.')[-1]
         features[0] = len(formatted_url)
         features[1] = n
@@ -392,3 +401,13 @@ class MLModel:
             model.fit(data_train, self.labels)
         pickle.dump(model, open(path, 'wb'))
         return path
+
+    def get_url_and_labels(self) -> tuple(str, int):
+        '''
+        Retrieves URL and labels as tuple
+        Returns
+        -------
+        tuple(str, int):
+            A tuple of the URL and label of datapoint
+        '''
+        return (self.urls, self.labels)

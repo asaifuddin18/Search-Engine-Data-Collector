@@ -162,7 +162,7 @@ def home(request):
     context = {'model': rf.model, 'num_datapoints': len(rf.labels), 'class_count': rf.get_class_count()}
     return render(request, 'search/home.html', context=context)
 # Create your views here.
-def edit(request, annotation): #this is submitting annotations
+def edit(request, annotation, words): #this is submitting annotations
     '''
     Function that handles the user's submitted annotations and renders the homepage of the website
     Parameters
@@ -173,12 +173,12 @@ def edit(request, annotation): #this is submitting annotations
     -------
     HTML: search/home.html
     '''
+    for word in words.split('~'):
+        if word == '':
+            continue
+        rf.add_word(word)
+
     truths = [int(c) for c in annotation]
-    #for c in annotation:
-    #    if c == '0':
-    #        truths.append("not_homepage")
-    #    else:
-    #        truths.append(current_object + "_homepage")
     
     
     global current_links

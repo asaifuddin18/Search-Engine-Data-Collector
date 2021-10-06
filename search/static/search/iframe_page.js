@@ -49,7 +49,11 @@ document.getElementById('submit_annotation').addEventListener("click", function(
             return
         }
     }
-    document.location.href = "/" +'edit/' + annotation_string;
+    var wordString = "";
+    for (var i = 0; i < wordsToPass.length; i++) {
+        wordString += wordsToPass[i] + "~";
+    }
+    document.location.href = "/" +'edit/' + annotation_string + "/" + wordString;
 })
 /**
  * Logic for toggling annotation buttons & pre-selecting inferences from ML model
