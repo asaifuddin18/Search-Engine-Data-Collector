@@ -19,7 +19,8 @@ var dict_t = {
 
 var models = {
     "rf": "Random Forest",
-    "svm": "SVM"
+    "svm": "SVM",
+    "me": "ME"
 };
 var qs = ["q1", "q2", "q3", "q4", "q5", "q6"];
 var past_accuracy = null;

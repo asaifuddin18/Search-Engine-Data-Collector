@@ -7,7 +7,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import GaussianNB
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.naive_bayes import ComplementNB
 from sklearn.svm import SVC
+from sklearn import linear_model
 import sklearn
 from urllib.parse import urlparse
 import urllib, sys, bs4
@@ -200,11 +205,11 @@ class MLModel:
         #data = pd.get_dummies(self.df) #probably have to do the same with labels
         features = np.array(self.df)
         
-        train_features, test_features, train_labels, test_labels = train_test_split(features, self.labels, test_size = .3) #Is this too expensive?
+        train_features, test_features, train_labels, test_labels = train_test_split(features, self.labels, test_size = .25) #Is this too expensive?
         inferences = []
         if self.model == 'Random Forest':
             print('rf')
-            rf = RandomForestClassifier()
+            rf = RandomForestClassifier(n_estimators=200)
             rf.fit(train_features, train_labels)
             inferences = rf.predict(test_features)
         elif self.model == 'SVM':
@@ -212,11 +217,27 @@ class MLModel:
             svm = make_pipeline(StandardScaler(), SVC(gamma='auto'))
             svm.fit(train_features, train_labels)
             inferences = svm.predict(test_features)
+        elif self.model == 'ME':
+            print('ME')
+            model = LogisticRegression()
+            model.fit(train_features, train_labels)
+            inferences = model.predict(test_features)
+        elif self.model == 'OCSVM':
+            print('one class')
+            model = linear_model.SGDOneClassSVM()
+            model.fit(train_features, train_labels)
+            inferences = model.predict(test_features)
+        elif self.model == 'GNB':
+            print('GNB')
+            model = ComplementNB()
+            model.fit(train_features, train_labels)
+            inferences = model.predict(test_features)
 
         f1 = sklearn.metrics.f1_score(test_labels, inferences, zero_division=0)
         recall = sklearn.metrics.recall_score(test_labels, inferences, zero_division=0)
         precision = sklearn.metrics.precision_score(test_labels, inferences, zero_division=0)
         accuracy = sklearn.metrics.accuracy_score(test_labels, inferences)
+        print(inferences, test_labels)
         return [accuracy, recall, precision, f1]
 
 
@@ -255,6 +276,16 @@ class MLModel:
             svm = make_pipeline(StandardScaler(), SVC(gamma='auto'))
             svm.fit(data_train, self.labels)
             inferences = svm.predict(data_test)
+        elif self.model == 'ME':
+            print('ME')
+            model = LogisticRegression()
+            model.fit(data_train, self.labels)
+            inferences = model.predict(data_test)
+        elif self.model == 'OCSVM':
+            print('one class')
+            model = linear_model.SGDOneClassSVM()
+            model.fit(data_train, self.labels)
+            inferences = model.predict(data_test)
         return inferences.tolist()
 
     def tf_mi_array(self, arr) -> np.array:
@@ -414,6 +445,14 @@ class MLModel:
         elif self.model == 'SVM':
             print('svm')
             model = make_pipeline(StandardScaler(), SVC(gamma='auto'))
+            model.fit(data_train, self.labels)
+        elif self.model == 'ME':
+            print('ME')
+            model = LogisticRegression()
+            model.fit(data_train, self.labels)
+        elif self.model == 'OCSVM':
+            print('one class')
+            model = linear_model.SGDOneClassSVM(average='macro')
             model.fit(data_train, self.labels)
         pickle.dump(model, open(path, 'wb'))
         return path
