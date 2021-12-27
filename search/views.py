@@ -60,24 +60,6 @@ dict_t = {
     "Electronic": ["Name", "Model No./Year"],
     "Car": ["Make", "Model", "Year"]
 }
-'''def prune_divs(links, divs_):
-    divs = []
-    links_index = 0
-    for i in range(len(divs_)):
-        if len(divs) == 10:
-            break
-        for descendant in divs_[i].descendants:
-            if descendant != "" and descendant != " " and not isinstance(descendant, bs4.element.NavigableString) and descendant.has_attr('href'):
-                if descendant['href'] == links[links_index].url or links[links_index].url in descendant['href']:
-                    descendant['href'] = '#'
-                    divs.append(descendant)
-                    links_index += 1
-                    break
-                else:
-                    print(descendant['href'], links[links_index].url)
-        else:
-            print("Pruned a div\n")
-    return divs'''
 
 def clean_title_and_desc(title, desc):
     '''
@@ -134,23 +116,6 @@ def set_links_title_desc(results, divs):
         if len(current_links) >=10:
             break
     return str_divs
-                    
-
-
-'''def download_urls(links):
-    for i in range(len(links)):
-        headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
-        webContent = requests.get(links[i], headers=headers).content.decode()
-        soup = Soup(webContent)
-        head = soup.find('head')
-        base = soup.new_tag('base')
-        base_url ='http://'+ urlparse(links[i]).netloc
-        base['href'] = base_url
-        head.insert(1, base)
-        contents = '{% verbatim myblock %}' + str(soup) + '{% endverbatim myblock %}'
-        with open('./search/templates/search/url' + str(i) + '.html', 'w') as f:
-            f.write(contents)
-        print("Downloaded", links[i])'''
 
 def home(request):
     '''
@@ -164,14 +129,16 @@ def home(request):
 
 def no_words(request, annotation):
     return edit(request, annotation, "")
-# Create your views here.
-def edit(request, annotation, words): #this is submitting annotations
+
+def edit(request, annotation, words):
     '''
     Function that handles the user's submitted annotations and renders the homepage of the website
     Parameters
     ----------
     annotation: str
         A list of either 0's or 1's where 0 is not a hompeage and 1 is a homepage
+    words: str
+        A string of words with each word seperated by a '~'
     Returns
     -------
     HTML: search/home.html
@@ -319,6 +286,10 @@ def download_dataset(request):
 def change_model(request, model):
     '''
     Function that handles when the user attempts to change the current model type
+    Parameters
+    ----------
+    model: str
+        The name of the model to change to
     Returns
     -------
     HTML: search/home.html

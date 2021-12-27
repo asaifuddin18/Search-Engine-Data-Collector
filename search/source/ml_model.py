@@ -34,10 +34,14 @@ class MLModel:
         Pandas DataFrame that holds all the data
     model: str
         The current type of model being used
-    first_person_pronouns
-        A list of predefined first person pronouns to detect in a given Google search result description
     urls: list of strings
         The list of URLs from the Google Search Page
+    titles: list of strings
+        List of titles of the search results
+    descriptions: list of strings
+        List of descriptions of the search results
+    words: list of strings
+        List of custom words the user has added to the model
     Methods
     -------
     """
@@ -65,8 +69,15 @@ class MLModel:
         else:
             self.df = pd.DataFrame(columns=self.features)
         pass
-    
-    def add_word(self, word):
+    '''
+    Function that cleans and standardizes word to be added to words list
+    ...
+    Attributes
+    ----------
+    word: str
+        Word to be added to list
+    '''
+    def add_word(self, word) -> None:
         word = word.lower()
         if word not in self.features:
             self.words.append(word)
@@ -179,7 +190,8 @@ class MLModel:
             The ground-truth provided by the user
         title: str
             The title of the Google search result
-        n: The index the Google search result within the page
+        n: int
+            The index the Google search result within the page
         query: str
             The query inputted by the user
         """

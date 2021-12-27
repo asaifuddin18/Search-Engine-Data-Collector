@@ -1,6 +1,7 @@
 from django import forms
 '''
 Form object for user built query
+There are a total of 6 fields possible for the queries. Not all 6 may be used
 '''
 class QueryForm(forms.Form):
     your_object = forms.CharField(label='Your Object')
